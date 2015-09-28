@@ -5,14 +5,16 @@
 			Steps:
 			<ul>
 			{% for step in story.steps %}
-				<li>{{step.name}}</li>
+				<li>
+					<a href="{{url_for('show_step', step_id = step.id)}}">{{step.name}}</a>
+				</li>
 			{% endfor %}
 			</ul>
 		</div>
 		<div>
 			Initial step: 
 			{% if story.initial_step.name %}
-			{{story.initial_step.name}}
+			<a href="{{url_for('show_step', step_id = story.initial_step.id)}}">{{story.initial_step.name}}</a>
 			{% else %}
 			<a href="{{url_for('new_initial_step', story_id = story.id)}}">Create initial step</a>
 			{% endif %}

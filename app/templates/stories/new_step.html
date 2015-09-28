@@ -1,6 +1,10 @@
 <html>
 	<body>
+		{% if initial %}
 		<form action="{{url_for('new_initial_step', story_id = story_id)}}" method="post">
+		{% else %}
+		<form action="{{url_for('new_step', story_id = story_id)}}" method="post">
+		{% endif %}
 			<div>
 				<label for="name">Name:</label>
 				<input id="name" type="text" name="name" />
@@ -8,6 +12,30 @@
 			<div>
 				<label for="content">Content:</label>
 				<textarea id="content" name="content" cols="30" rows="10"></textarea>
+			</div>
+			<div>
+				<label for="first_choice_text">First choice text</label>
+				<input id="first_choice_text" type="text" name="first_choice_text" />
+
+				<label for="first_choice">Step</label>
+				<select id="first_choice" name="first_choice">
+					<option value="">None</option>
+					{% for step in steps %}
+					<option value="{{step.id}}">{{step.name}}</option>
+					{% endfor %}
+				</select>
+			</div>
+			<div>
+				<label for="second_choice_text">Second choice text</label>
+				<input id="second_choice_text" type="text" name="second_choice_text" />
+
+				<label for="second_choice">Step</label>
+				<select id="second_choice" name="second_choice">
+					<option value="">None</option>
+					{% for step in steps %}
+					<option value="{{step.id}}">{{step.name}}</option>
+					{% endfor %}
+				</select>
 			</div>
 			<div>
 				<button>Submit</button>

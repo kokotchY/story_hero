@@ -1,0 +1,41 @@
+<html>
+	<body>
+		<form action="{{url_for('edit_step', step_id = step.id)}}" method="post">
+			<div>
+				<label for="name">Name:</label>
+				<input id="name" type="text" name="name" value="{{step.name}}"/>
+			</div>
+			<div>
+				<label for="content">Content:</label>
+				<textarea id="content" name="content" cols="30" rows="10">{{step.content}}</textarea>
+			</div>
+			<div>
+				<label for="first_choice_text">First choice text</label>
+				<input id="first_choice_text" type="text" name="first_choice_text" value="{{step.first_choice}}"/>
+
+				<label for="first_choice">Step</label>
+				<select id="first_choice" name="first_choice">
+					<option value="">None</option>
+					{% for select_step in steps %}
+					<option value="{{select_step.id}}" {% if select_step.id == step.first_choice_step_id %}selected="selected"{% endif %}>{{select_step.name}}</option>
+					{% endfor %}
+				</select>
+			</div>
+			<div>
+				<label for="second_choice_text">Second choice text</label>
+				<input id="second_choice_text" type="text" name="second_choice_text" value="{{step.second_choice}}"/>
+
+				<label for="second_choice">Step</label>
+				<select id="second_choice" name="second_choice">
+					<option value="">None</option>
+					{% for select_step in steps %}
+					<option value="{{select_step.id}}" {% if select_step.id == step.first_choice_step_id %}selected="selected"{% endif %}>{{select_step.name}}</option>
+					{% endfor %}
+				</select>
+			</div>
+			<div>
+				<button>Submit</button>
+			</div>
+		</form>
+	</body>
+</html>
