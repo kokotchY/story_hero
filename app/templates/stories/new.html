@@ -1,0 +1,13 @@
+<html>
+	<body>
+		<form action="{{url_for('new_story', user_id = user_id)}}" method="post">
+			<div>
+				<label for="name">Name:</label>
+				<input id="name" type="text" name="name" />
+			</div>
+			<div>
+				<button>Add new story</button>
+			</div>
+		</form>
+	</body>
+</html>

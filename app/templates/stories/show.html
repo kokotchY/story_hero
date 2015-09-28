@@ -1,0 +1,21 @@
+<html>
+	<body>
+		<h1>{{story.name}} (by {{story.user.username}}) @ {{story.timestamp}}</h1>
+		<div>
+			Steps:
+			<ul>
+			{% for step in story.steps %}
+				<li>{{step.name}}</li>
+			{% endfor %}
+			</ul>
+		</div>
+		<div>
+			Initial step: 
+			{% if story.initial_step.name %}
+			{{story.initial_step.name}}
+			{% else %}
+			<a href="{{url_for('new_initial_step', story_id = story.id)}}">Create initial step</a>
+			{% endif %}
+		</div>
+	</body>
+</html>

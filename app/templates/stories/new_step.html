@@ -1,0 +1,17 @@
+<html>
+	<body>
+		<form action="{{url_for('new_initial_step', story_id = story_id)}}" method="post">
+			<div>
+				<label for="name">Name:</label>
+				<input id="name" type="text" name="name" />
+			</div>
+			<div>
+				<label for="content">Content:</label>
+				<textarea id="content" name="content" cols="30" rows="10"></textarea>
+			</div>
+			<div>
+				<button>Submit</button>
+			</div>
+		</form>
+	</body>
+</html>
