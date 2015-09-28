@@ -72,4 +72,39 @@ def new_initial_step(story_id):
         story.initial_step = step.id
         db.session.commit()
         return redirect(url_for('show_story', story_id = story_id))
-    return render_template('stories/new_step.html', story_id = story_id)
+    return render_template('stories/new_step.html', story_id = story_id, initial = True, steps = [])
+
+@app.route('/stories/<int:story_id>/new_step', methods = ['GET', 'POST'])
+def new_step(story_id):
+    steps = Step.query.filter_by(story_id = story_id).all()
+    if request.method == "POST":
+        step = Step(request.form['name'], request.form['content'], story_id)
+        step.first_choice = request.form['first_choice_text']
+        step.first_choice_step_id = request.form['first_choice']
+        step.second_choice = request.form['second_choice_text']
+        step.second_choice_step_id = request.form['second_choice']
+        db.session.add(step)
+        db.session.commit()
+        return redirect(url_for('show_step', step_id = step.id))
+    return render_template('stories/new_step.html', story_id = story_id, initial = False, steps = steps)
+
+@app.route('/step/<int:step_id>')
+def show_step(step_id):
+    step = Step.query.get_or_404(step_id)
+    story = Story.query.get_or_404(step.story_id)
+    return render_template('steps/show.html', step = step, story = story)
+
+@app.route('/step/<int:step_id>/edit', methods = ['GET', 'POST'])
+def edit_step(step_id):
+    step = Step.query.get_or_404(step_id)
+    steps = Step.query.filter_by(story_id = step.story_id).all()
+    if request.method == "POST":
+        step.name = request.form['name']
+        step.content = request.form['content']
+        step.first_choice = request.form['first_choice_text']
+        step.first_choice_step_id = request.form['first_choice']
+        step.second_choice = request.form['second_choice_text']
+        step.second_choice_step_id = request.form['second_choice']
+        db.session.commit()
+        return redirect(url_for('show_step', step_id = step.id))
+    return render_template('steps/edit.html', story_id = step.story_id, inital = False, steps = steps, step = step)
