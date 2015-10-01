@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block content %}
+Hello <br />
+Login as
+<ul>
+	{% for user in users %}
+	<li>
+		<a href="{{url_for('login', user = user.username)}}">{{user.username}}</a>
+	</li>
+	{% endfor %}
+</ul>
+<table>
+	<tr>
+		<th>String</th>
+		<th>Endpoint</th>
+		<th>Default</th>
+		<th>Arguments</th>
+		<th>Link</th>
+	</tr>
+	{% for url in urls.iter_rules() %}
+	<tr>
+		<td>{{url.string}}</td>
+		<td>{{url.endpoint}}</td>
+		<td>{{url.defaults}}</td>
+		<td>
+			<ul>
+				{% for arg in url.arguments %}
+				<li>{{arg}}</li>
+				{% endfor %}
+			</ul>
+		</td>
+		{% if url.arguments|length == 0 %}
+		<td>
+			<a href="{{url_for(url.endpoint)}}">{{url.rule}}</a>
+		</td>
+		{% else %}
+		<td>
+			{{url.rule}}
+		</td>
+		{% endif %}
+	</tr>
+	{% endfor %}
+	</ul>
+</table>
+
+{% endblock %}

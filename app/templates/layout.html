@@ -3,6 +3,14 @@
 		<title>Game</title>
 	</head>
 	<body>
+		{% if 'logged' in session and session['logged']%}
+		<div>
+			Logged as {{session['username']}}.
+			<a href="{{url_for('logout')}}">Logout</a>
+		</div>
+		{% else %}
+		<div>Not logged</div>
+		{% endif %}
 		<div class="content">
 			{% block content %}{% endblock %}
 		</div>

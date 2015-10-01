@@ -4,7 +4,7 @@
 from . import the_app as app
 from . import db
 from .models import User, Story, Step
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash, session
 
 @app.route('/users/add', methods=['GET', 'POST'])
 def add_user():
@@ -131,3 +131,21 @@ def list_steps():
 @app.route('/step/<int:step_id>/delete')
 def delete_step(step_id):
     pass
+
+@app.route('/')
+def index():
+    return render_template('index.html', users = User.query.all(), urls = app.url_map)
+
+@app.route('/login')
+@app.route('/login/<user>')
+def login(user = None):
+    if user:
+        session.new = True
+        session['username'] = user
+        session['logged'] = True
+        return redirect(url_for('index'))
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('index'))
