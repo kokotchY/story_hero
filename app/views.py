@@ -59,7 +59,11 @@ def new_story(user_id):
 @app.route('/stories/show/<int:story_id>')
 def show_story(story_id):
     story = Story.query.get_or_404(story_id)
-    return render_template('stories/show.html', story = story)
+    if story.initial_step_id:
+        initial_step = Step.query.get(story.initial_step_id)
+    else:
+        initial_step = None
+    return render_template('stories/show.html', story = story, initial_step = initial_step)
 
 @app.route('/stories/<int:story_id>/new_initial_step', methods = ['GET', 'POST'])
 def new_initial_step(story_id):
@@ -69,8 +73,10 @@ def new_initial_step(story_id):
         content = request.form['content']
         step = Step(name, content, story_id)
         db.session.add(step)
-        story.initial_step = step.id
         db.session.commit()
+        story.initial_step_id = step.id
+        db.session.commit()
+        print("New step %r created" % step)
         return redirect(url_for('show_story', story_id = story_id))
     return render_template('stories/new_step.html', story_id = story_id, initial = True, steps = [])
 
@@ -108,3 +114,8 @@ def edit_step(step_id):
         db.session.commit()
         return redirect(url_for('show_step', step_id = step.id))
     return render_template('steps/edit.html', story_id = step.story_id, inital = False, steps = steps, step = step)
+
+@app.route('/steps')
+def list_steps():
+    steps = Step.query.all()
+    return render_template('steps/list.html', steps = steps)

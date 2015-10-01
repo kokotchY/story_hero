@@ -10,11 +10,12 @@
 				</li>
 			{% endfor %}
 			</ul>
+			<a href="{{url_for('new_step', story_id = story.id)}}">New step</a>
 		</div>
 		<div>
 			Initial step: 
-			{% if story.initial_step.name %}
-			<a href="{{url_for('show_step', step_id = story.initial_step.id)}}">{{story.initial_step.name}}</a>
+			{% if initial_step.name %}
+			<a href="{{url_for('show_step', step_id = initial_step.id)}}">{{initial_step.name}}</a>
 			{% else %}
 			<a href="{{url_for('new_initial_step', story_id = story.id)}}">Create initial step</a>
 			{% endif %}
