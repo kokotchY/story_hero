@@ -25,6 +25,7 @@ def upgrade():
     sa.Column('first_choice_step_id', sa.Integer(), nullable=True),
     sa.Column('second_choice', sa.String(length=50), nullable=True),
     sa.Column('second_choice_step_id', sa.Integer(), nullable=True),
+    sa.Column('final', sa.Boolean(), nullable=True),
     sa.ForeignKeyConstraint(['first_choice_step_id'], ['step.id'], ),
     sa.ForeignKeyConstraint(['second_choice_step_id'], ['step.id'], ),
     sa.ForeignKeyConstraint(['story_id'], ['story.id'], ),

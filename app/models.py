@@ -28,6 +28,7 @@ class Step(db.Model):
     second_choice = db.Column(db.String(50))
     second_choice_step_id = db.Column(db.Integer, db.ForeignKey('step.id'), nullable=True)
     second_choice_step = db.relationship('Step', uselist=False, remote_side=[id], foreign_keys=[second_choice_step_id])
+    final = db.Column(db.Boolean)
 
     def __init__(self, name, content, story_id):
         self.name = name
