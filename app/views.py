@@ -119,3 +119,7 @@ def edit_step(step_id):
 def list_steps():
     steps = Step.query.all()
     return render_template('steps/list.html', steps = steps)
+
+@app.route('/step/<int:step_id>/delete')
+def delete_step(step_id):
+    pass

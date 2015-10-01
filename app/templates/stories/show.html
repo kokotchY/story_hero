@@ -3,13 +3,29 @@
 		<h1>{{story.name}} (by {{story.user.username}}) @ {{story.timestamp}}</h1>
 		<div>
 			Steps:
-			<ul>
+			<table>
+				<tr>
+					<th>Name</th>
+					<th>Choice 1 Text</th>
+					<th>Choice 1 Step</th>
+					<th>Choice 2 Text</th>
+					<th>Choice 2 Step</th>
+					<th>Actions</th>
+				</tr>
 			{% for step in story.steps %}
-				<li>
-					<a href="{{url_for('show_step', step_id = step.id)}}">{{step.name}}</a>
-				</li>
+				<tr>
+					<td><a href="{{url_for('show_step', step_id = step.id)}}">{{step.name}}</a></td>
+					<td>{{step.first_choice}}</td>
+					<td>{{step.first_choice_step_id}}</td>
+					<td>{{step.second_choice}}</td>
+					<td>{{step.second_choice_step_id}}</td>
+					<td>
+						<a href="{{url_for('edit_step', step_id = step.id)}}">Edit</a>|
+						<a href="{{url_for('delete_step', step_id = step.id)}}">Delete</a>
+					</td>
+				</tr>
 			{% endfor %}
-			</ul>
+			</table>
 			<a href="{{url_for('new_step', story_id = story.id)}}">New step</a>
 		</div>
 		<div>
