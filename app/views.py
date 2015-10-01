@@ -89,6 +89,10 @@ def new_step(story_id):
         step.first_choice_step_id = request.form['first_choice']
         step.second_choice = request.form['second_choice_text']
         step.second_choice_step_id = request.form['second_choice']
+        if "final_step" in request.form:
+            step.final = request.form['final_step'] == "on"
+        else:
+            step.final = False
         db.session.add(step)
         db.session.commit()
         return redirect(url_for('show_step', step_id = step.id))
@@ -111,6 +115,10 @@ def edit_step(step_id):
         step.first_choice_step_id = request.form['first_choice']
         step.second_choice = request.form['second_choice_text']
         step.second_choice_step_id = request.form['second_choice']
+        if "final_step" in request.form:
+            step.final = request.form['final_step'] == "on"
+        else:
+            step.final = False
         db.session.commit()
         return redirect(url_for('show_step', step_id = step.id))
     return render_template('steps/edit.html', story_id = step.story_id, inital = False, steps = steps, step = step)

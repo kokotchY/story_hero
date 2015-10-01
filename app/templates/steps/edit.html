@@ -34,6 +34,10 @@
 				</select>
 			</div>
 			<div>
+				<label for="final_step">Final Step?</label>
+				<input id="final_step" type="checkbox" name="final_step" {% if step.final %}checked="checked"{% endif %} />
+			</div>
+			<div>
 				<button>Submit</button>
 			</div>
 		</form>

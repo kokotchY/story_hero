@@ -4,6 +4,7 @@
 		<div>
 			{{step.content}}
 		</div>
+		{% if not step.final %}
 		<span>
 			First choice:
 			{% if step.first_choice %}
@@ -29,6 +30,7 @@
 			{% endif %}
 		</span>
 		<br />
+		{% endif %}
 		<a href="{{url_for('show_story', story_id = step.story_id)}}">Back to story</a>
 	</body>
 </html>
