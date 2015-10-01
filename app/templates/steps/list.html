@@ -1,9 +1,8 @@
-<html>
-	<body>
+{% extends "layout.html" %}
+{% block content %}
 		<ul>
 			{% for step in steps %}
 			<li>{{step.name}} (<a href="{{url_for('show_story', story_id = step.story_id)}}">{{step.story}}</a>)</li>
 			{% endfor %}
 		</ul>
-	</body>
-</html>
+{% endblock %}

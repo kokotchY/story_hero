@@ -1,5 +1,5 @@
-<html>
-	<body>
+{% extends "layout.html" %}
+{% block content %}
 		{% if get_flashed_messages() %}
 		{% for message in get_flashed_messages() %}
 		<div class="alert alert-warning">
@@ -29,5 +29,4 @@
 			</table>
 		</div>
 		<a href="{{url_for('add_user')}}">Add user</a>
-	</body>
-</html>
+{% endblock %}

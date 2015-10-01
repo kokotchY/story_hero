@@ -1,5 +1,5 @@
-<html>
-	<body>
+{% extends "layout.html" %}
+{% block content %}
 		<h2>Stories of user {{user.username}}</h2>
 		<ul>
 			{% for story in stories %}
@@ -8,5 +8,4 @@
 		</ul>
 
 		<a href="{{url_for('new_story', user_id = user.id)}}">New story</a>
-	</body>
-</html>
+{% endblock %}

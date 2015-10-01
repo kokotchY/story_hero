@@ -1,8 +1,7 @@
-<html>
-	<body>
+{% extends "layout.html" %}
+{% block content %}
 		<ul>
 			<li>User: {{user.username}}</li>
 			<li>Email: {{user.email}}</li>
 		</ul>
-	</body>
-</html>
+{% endblock %}

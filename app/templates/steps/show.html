@@ -1,5 +1,5 @@
-<html>
-	<body>
+{% extends "layout.html" %}
+{% block content %}
 		<h1>Step {{step.name}} in {{story.name}}</h1>
 		<div>
 			{{step.content}}
@@ -32,5 +32,4 @@
 		<br />
 		{% endif %}
 		<a href="{{url_for('show_story', story_id = step.story_id)}}">Back to story</a>
-	</body>
-</html>
+{% endblock %}
