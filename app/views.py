@@ -223,29 +223,20 @@ def generate_dot(story_id):
     story = Story.query.get_or_404(story_id)
     res = Response()
     g = Digraph(story.name)
+    for step in story.steps:
+        if step.final:
+            g.node('step_%d' % step.id, label=step.name, color="lightblue2", style="filled")
+        else:
+            g.node('step_%d' % step.id, label=step.name)
+        if step.first_choice_step_id:
+            g.edge('step_%d' % step.id, 'step_%d' % step.first_choice_step_id, label = step.first_choice)
+        if step.second_choice_step_id:
+            g.edge('step_%d' % step.id, 'step_%d' % step.second_choice_step_id, label = step.second_choice)
     if str(request.url_rule).endswith('dot'):
         res.content_type = "text/plain"
-        res.data = render_template('dot.dot', story = story)
-        return res
+        res.data = g.source
     elif str(request.url_rule).endswith('png'):
         g.format = 'png'
-        for step in story.steps:
-            if step.final:
-                g.node('step_%d' % step.id, label=step.name, color="lightblue2", style="filled")
-            else:
-                g.node('step_%d' % step.id, label=step.name)
-            if step.first_choice_step_id:
-                g.edge('step_%d' % step.id, 'step_%d' % step.first_choice_step_id, label = step.first_choice)
-            if step.second_choice_step_id:
-                g.edge('step_%d' % step.id, 'step_%d' % step.second_choice_step_id, label = step.second_choice)
-        g.render('story-%d' % story.id, directory='app/graphs', cleanup=True)
-        return send_file('graphs/story-%d.png' % story.id, mimetype='image/png')
-
-
-@app.route('/dot_png')
-def dot_png():
-    g = Digraph('G')
-    g.edge('Hello', 'World')
-    g.format = 'png'
-    g.render(filename="bonjour", directory="app/graphs", cleanup=True)
-    return send_file('graphs/bonjour.png', mimetype='image/png')
+        res.content_type = 'image/png'
+        res.data = g.pipe()
+    return res
