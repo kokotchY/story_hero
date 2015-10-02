@@ -3,3 +3,4 @@ flask-script
 flask-sqlalchemy
 flask-migrate
 flask_debugtoolbar
+graphviz
