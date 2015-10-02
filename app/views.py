@@ -179,3 +179,8 @@ def show_instance(instance_id, choice = None):
         return render_template('/steps/play.html', story = instance.story, step = step, instance_id = instance_id)
     else:
         return 'This is not your story!'
+
+@app.route('/stories')
+def stories():
+    stories = Story.query.all()
+    return render_template('stories/all.html', stories = stories)

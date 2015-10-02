@@ -1,0 +1,8 @@
+{% extends "layout.html" %}
+{% block content %}
+<ul>
+	{% for story in stories %}
+	<li>{{story.name}}: <a href="{{url_for('start_story', story_id = story.id)}}">Start</a></li>
+	{% endfor %}
+</ul>
+{% endblock %}
