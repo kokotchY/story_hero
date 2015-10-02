@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Story: {{story.name}}</h1>
+<div>
+	<div>{{step.name}} ({{step.id}})</div>
+	<div>{{step.content}}</div>
+	{% if not step.final %}
+	{% if step.first_choice_step_id %}
+	<div>First choice:
+		<a href="{{url_for('show_instance', instance_id = instance_id, choice = 1)}}">{{step.first_choice}}</a>
+	</div>
+	{% endif %}
+	{% if step.second_choice_step_id %}
+	<div>Second choice:
+		<a href="{{url_for('show_instance', instance_id = instance_id, choice = 2)}}">{{step.second_choice}}</a>
+	</div>
+	{% endif %}
+	{% else %}
+		<strong>End of the story!</strong>
+	{% endif %}
+</div>
+{% endblock %}

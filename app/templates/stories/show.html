@@ -38,4 +38,18 @@
 			<a href="{{url_for('new_initial_step', story_id = story.id)}}">Create initial step</a>
 			{% endif %}
 		</div>
+		<div>
+			<a href="{{url_for('start_story', story_id = story.id)}}">Start the story</a>
+		</div>
+		<div>
+			{% set instances = story.instances.all() %}
+			<h1>Instances ({{instances|length}})</h1>
+			<ul>
+			{% for instance in instances %}
+			<li>
+				<a href="{{url_for('show_instance', instance_id = instance.id)}}">{{instance.user.username}} @ {{instance.started}}</a>
+			</li>
+			{% endfor %}
+			</ul>
+		</div>
 {% endblock %}

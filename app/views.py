@@ -3,7 +3,7 @@
 
 from . import the_app as app
 from . import db
-from .models import User, Story, Step
+from .models import User, Story, Step, InstanceStory
 from flask import render_template, request, redirect, url_for, flash, session
 
 @app.route('/users/add', methods=['GET', 'POST'])
@@ -149,3 +149,30 @@ def login(user = None):
 def logout():
     session.clear()
     return redirect(url_for('index'))
+
+@app.route('/stories/<int:story_id>/start')
+def start_story(story_id):
+    story = Story.query.get_or_404(story_id)
+    instance = InstanceStory(story.id, session['id'], story.initial_step_id)
+    db.session.add(instance)
+    db.session.commit()
+    return redirect(url_for('show_instance', instance_id = instance.id))
+
+@app.route('/stories/<int:instance_id>/play')
+@app.route('/stories/<int:instance_id>/play/<int:choice>')
+def show_instance(instance_id, choice = None):
+    instance = InstanceStory.query.get_or_404(instance_id)
+    if 'id' in session and instance.user_id == session['id']:
+        step = Step.query.get_or_404(instance.current_step_id)
+        if choice:
+            if choice == 1:
+                step = Step.query.get_or_404(step.first_choice_step_id)
+                instance.current_step_id = step.id
+                db.session.commit()
+            elif choice == 2:
+                step = Step.query.get_or_404(step.second_choice_step_id)
+                instance.current_step_id = step.second_choice_step_id
+                db.session.commit()
+        return render_template('/steps/play.html', story = instance.story, step = step, instance_id = instance_id)
+    else:
+        return 'This is not your story!'

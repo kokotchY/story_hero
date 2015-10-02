@@ -9,6 +9,7 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True)
     email = db.Column(db.String(120), unique=True)
     stories = db.relationship('Story', backref='user', lazy='joined')
+    instances = db.relationship('InstanceStory', backref='user', lazy='dynamic')
 
     def __init__(self, username, email):
         self.username = username
@@ -45,6 +46,7 @@ class Story(db.Model):
     timestamp = db.Column(db.DateTime)
     steps = db.relationship('Step', backref='story', lazy='joined', foreign_keys=[Step.story_id])
     initial_step_id = db.Column(db.Integer, db.ForeignKey('step.id'))
+    instances = db.relationship('InstanceStory', backref='story', lazy='dynamic')
 
     def __init__(self, name, user_id):
         self.name = name
@@ -54,3 +56,20 @@ class Story(db.Model):
     def __repr__(self):
         return '<Story %r (%r)>' % (self.name, self.user_id)
 
+
+class InstanceStory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    story_id = db.Column(db.Integer, db.ForeignKey('story.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    current_step_id = db.Column(db.Integer, db.ForeignKey('step.id'))
+    finished = db.Column(db.Boolean)
+    started = db.Column(db.DateTime)
+
+    def __init__(self, story_id, user_id, current_step_id):
+        self.story_id = story_id
+        self.user_id = user_id
+        self.current_step_id = current_step_id
+        self.started = datetime.datetime.now()
+
+    def __repr__(self):
+        return '<InstanceStory %r %r %r>' % (self.story_id, self.user_id, self.current_step_id)
