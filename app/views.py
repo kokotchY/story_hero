@@ -140,10 +140,13 @@ def index():
 @app.route('/login/<user>')
 def login(user = None):
     if user:
-        session.new = True
-        session['username'] = user
-        session['logged'] = True
-        return redirect(url_for('index'))
+        user_db = User.query.filter_by(username=user).first()
+        if user_db:
+            session.new = True
+            session['username'] = user
+            session['id'] = user_db.id
+            session['logged'] = True
+            return redirect(url_for('index'))
 
 @app.route('/logout')
 def logout():
