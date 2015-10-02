@@ -23,6 +23,7 @@ def upgrade():
     sa.Column('current_step_id', sa.Integer(), nullable=True),
     sa.Column('finished', sa.Boolean(), nullable=True),
     sa.Column('started', sa.DateTime(), nullable=True),
+    sa.Column('finished_timestamp', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['current_step_id'], ['step.id'], ),
     sa.ForeignKeyConstraint(['story_id'], ['story.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),

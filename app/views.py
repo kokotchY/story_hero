@@ -3,8 +3,9 @@
 
 from . import the_app as app
 from . import db
-from .models import User, Story, Step, InstanceStory
+from .models import User, Story, Step, InstanceStory, HistoryInstance
 from flask import render_template, request, redirect, url_for, flash, session
+import datetime
 
 @app.route('/users/add', methods=['GET', 'POST'])
 def add_user():
@@ -159,6 +160,9 @@ def start_story(story_id):
     instance = InstanceStory(story.id, session['id'], story.initial_step_id)
     db.session.add(instance)
     db.session.commit()
+    history = HistoryInstance(instance.id, None, story.initial_step_id, None)
+    db.session.add(history)
+    db.session.commit()
     return redirect(url_for('show_instance', instance_id = instance.id))
 
 @app.route('/stories/<int:instance_id>/play')
@@ -169,12 +173,26 @@ def show_instance(instance_id, choice = None):
         step = Step.query.get_or_404(instance.current_step_id)
         if choice:
             if choice == 1:
+                from_step_id = step.id
+                choice_text = step.first_choice
                 step = Step.query.get_or_404(step.first_choice_step_id)
+                history = HistoryInstance(instance.id, from_step_id, step.id, choice_text)
                 instance.current_step_id = step.id
+                if step.final:
+                    instance.finished_timestamp = datetime.datetime.now()
+                    instance.finished = True
+                db.session.add(history)
                 db.session.commit()
             elif choice == 2:
+                from_step_id = step.id
+                choice_text = step.second_choice
                 step = Step.query.get_or_404(step.second_choice_step_id)
+                history = HistoryInstance(instance.id, from_step_id, step.id, choice_text)
                 instance.current_step_id = step.second_choice_step_id
+                if step.final:
+                    instance.finished_timestamp = datetime.datetime.now()
+                    instance.finished = True
+                db.session.add(history)
                 db.session.commit()
         return render_template('/steps/play.html', story = instance.story, step = step, instance_id = instance_id)
     else:
@@ -184,3 +202,15 @@ def show_instance(instance_id, choice = None):
 def stories():
     stories = Story.query.all()
     return render_template('stories/all.html', stories = stories)
+
+@app.route('/instances')
+def instances():
+    instances = InstanceStory.query.filter_by(user_id = session['id']).all()
+    return render_template('instances.html', instances = instances)
+
+@app.route('/instances/<int:instance_id>/delete')
+def delete_instance(instance_id):
+    instance = InstanceStory.query.get_or_404(instance_id)
+    db.session.delete(instance)
+    db.session.commit()
+    return redirect(url_for('instances'))

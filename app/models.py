@@ -64,6 +64,8 @@ class InstanceStory(db.Model):
     current_step_id = db.Column(db.Integer, db.ForeignKey('step.id'))
     finished = db.Column(db.Boolean)
     started = db.Column(db.DateTime)
+    finished_timestamp = db.Column(db.DateTime)
+    history = db.relationship('HistoryInstance', backref='instance', lazy='joined')
 
     def __init__(self, story_id, user_id, current_step_id):
         self.story_id = story_id
@@ -73,3 +75,18 @@ class InstanceStory(db.Model):
 
     def __repr__(self):
         return '<InstanceStory %r %r %r>' % (self.story_id, self.user_id, self.current_step_id)
+
+class HistoryInstance(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    instance_id = db.Column(db.Integer, db.ForeignKey('instance_story.id'))
+    from_step_id = db.Column(db.Integer, db.ForeignKey('step.id'))
+    to_step_id = db.Column(db.Integer, db.ForeignKey('step.id'))
+    choice_text = db.Column(db.String(50))
+    timestamp = db.Column(db.DateTime)
+
+    def __init__(self, instance_id, from_step_id, to_step_id, choice_text):
+        self.instance_id = instance_id
+        self.from_step_id = from_step_id
+        self.to_step_id = to_step_id
+        self.choice_text = choice_text
+        self.timestamp = datetime.datetime.now()
