@@ -1,0 +1,8 @@
+.content, .messages {
+	margin: 5px;
+}
+
+#login {
+	width: 20%;
+	margin: auto;
+}
