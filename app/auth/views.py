@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- UTF-8 -*-
 
-from flask import render_template, redirect, url_for, flash, request, current_app
+from flask import render_template, redirect, url_for, flash, request, current_app, session
 from . import auth
 from .forms import LoginForm, RegisterForm
 from ..models import User
@@ -15,6 +15,7 @@ def login():
         user = User.query.filter_by(username = form.username.data).first()
         if user and user.verify_password(form.password.data):
             login_user(user, remember = form.remember_me.data)
+            session['username'] = user.username
 
             flash('Logged in successfully.')
 

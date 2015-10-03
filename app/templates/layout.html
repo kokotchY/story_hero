@@ -1,9 +1,22 @@
 {% macro display_nav_link(target, label, icon=None) %}
 {% if request.url_rule.endpoint == target %}
-<li class="active"><a href="{{url_for(target)}}">{{label}} <span class="sr-only">(current)</span></a></li>
+<li class="active">
+	<a href="{{url_for(target)}}">
+		{% if icon %}{{display_icon(icon)}}{% endif %}
+		{{label}} <span class="sr-only">(current)</span>
+	</a>
+</li>
 {% else %}
-<li><a href="{{url_for(target)}}">{{label}}</a></li>
+<li>
+	<a href="{{url_for(target)}}">
+		{% if icon %}{{display_icon(icon)}}{% endif %}
+		{{label}}
+	</a>
+</li>
 {% endif %}
+{% endmacro %}
+{% macro display_icon(name) %}
+<span class="glyphicon glyphicon-{{name}}" aria-hidden="true"></span>
 {% endmacro %}
 <!DOCTYPE html>
 <html lang="en">
@@ -36,20 +49,21 @@
 						{{display_nav_link('list_users', 'Users')}}
 					</ul>
 					<ul class="nav navbar-nav navbar-right">
-						{% if current_user.is_logged %}
+						{% if current_user.is_authenticated %}
 						<li class="dropdown">
-							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+								{{display_icon('user')}} {{session['username']}}<span class="caret"></span></a>
 							<ul class="dropdown-menu">
 								<li><a href="#">Action</a></li>
 								<li><a href="#">Another action</a></li>
 								<li><a href="#">Something else here</a></li>
 								<li role="separator" class="divider"></li>
-								<li><a href="#">Separated link</a></li>
+								{{display_nav_link('auth.logout', 'Logout', 'log-out')}}
 							</ul>
 						</li>
 						{% else %}
 						{{display_nav_link('auth.register', 'Register')}}
-						{{display_nav_link('auth.login', 'Login')}}
+						{{display_nav_link('auth.login', 'Login', 'log-in')}}
 						{% endif %}
 					</ul>
 				</div><!-- /.navbar-collapse -->
