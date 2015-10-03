@@ -12,13 +12,10 @@
 			</ul>
 		</div>
 		{% endif %}
-		{% if 'logged' in session and session['logged']%}
-		<div>
-			Logged as {{session['username']}}.
-			<a href="{{url_for('logout')}}">Logout</a>
-		</div>
+		{% if current_user.is_authenticated %}
+			Hi {{ current_user.username }}! <a href="{{url_for('logout')}}">Logout</a>
 		{% else %}
-		<div>Not logged</div>
+			Not logged
 		{% endif %}
 		<div class="content">
 			{% block content %}{% endblock %}

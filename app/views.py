@@ -145,7 +145,7 @@ def delete_step(step_id):
 
 @app.route('/')
 def index():
-    return render_template('index.html', users = User.query.all(), urls = app.url_map)
+    return render_template('index.html')
 
 @app.route('/login/<user>')
 def login_username(user):
@@ -272,3 +272,9 @@ def logout():
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(user_id)
+
+@app.route('/debug')
+def debug():
+    if app.debug:
+        return render_template('debug.html', users = User.query.all(), urls = app.url_map)
+    return abort(404)
