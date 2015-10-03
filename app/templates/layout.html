@@ -3,6 +3,15 @@
 		<title>Game</title>
 	</head>
 	<body>
+		{% if get_flashed_messages() %}
+		<div class="messages">
+			<ul>
+				{% for message in get_flashed_messages() %}
+				<li>{{message}}</li>
+				{% endfor %}
+			</ul>
+		</div>
+		{% endif %}
 		{% if 'logged' in session and session['logged']%}
 		<div>
 			Logged as {{session['username']}}.
