@@ -142,7 +142,7 @@ def index():
 @app.route('/stories/<int:story_id>/start')
 def start_story(story_id):
     story = Story.query.get_or_404(story_id)
-    instance = InstanceStory(story.id, session['id'], story.initial_step_id)
+    instance = InstanceStory(story.id, session['user_id'], story.initial_step_id)
     db.session.add(instance)
     db.session.commit()
     history = HistoryInstance(instance.id, None, story.initial_step_id, None)
@@ -154,7 +154,7 @@ def start_story(story_id):
 @app.route('/stories/<int:instance_id>/play/<int:choice>')
 def show_instance(instance_id, choice = None):
     instance = InstanceStory.query.get_or_404(instance_id)
-    if 'id' in session and instance.user_id == session['id']:
+    if 'user_id' in session and instance.user_id == int(session['user_id']):
         step = Step.query.get_or_404(instance.current_step_id)
         if choice:
             if choice == 1:
@@ -181,7 +181,7 @@ def show_instance(instance_id, choice = None):
                 db.session.commit()
         return render_template('/steps/play.html', story = instance.story, step = step, instance_id = instance_id)
     else:
-        return 'This is not your story!'
+        return 'This is not your story! %s != %s' % (str(type(instance.user_id)), str(type(session['user_id'])))
 
 @app.route('/stories')
 def stories():
@@ -190,7 +190,7 @@ def stories():
 
 @app.route('/instances')
 def instances():
-    instances = InstanceStory.query.filter_by(user_id = session['id']).all()
+    instances = InstanceStory.query.filter_by(user_id = session['user_id']).all()
     return render_template('instances.html', instances = instances)
 
 @app.route('/instances/<int:instance_id>/delete')
@@ -201,8 +201,31 @@ def delete_instance(instance_id):
     return redirect(url_for('instances'))
 
 @app.route('/story/<int:story_id>.dot')
-@app.route('/story/<int:story_id>.png')
 def generate_dot(story_id):
+    print(request.url_rule)
+    story = Story.query.get_or_404(story_id)
+    res = Response()
+    g = Digraph(story.name)
+    for step in story.steps:
+        if step.final:
+            g.node('step_%d' % step.id, label=step.name, color="lightblue2", style="filled")
+        else:
+            g.node('step_%d' % step.id, label=step.name)
+        if step.first_choice_step_id:
+            g.edge('step_%d' % step.id, 'step_%d' % step.first_choice_step_id, label = step.first_choice)
+        if step.second_choice_step_id:
+            g.edge('step_%d' % step.id, 'step_%d' % step.second_choice_step_id, label = step.second_choice)
+    if str(request.url_rule).endswith('dot'):
+        res.content_type = "text/plain"
+        res.data = g.source
+    elif str(request.url_rule).endswith('png'):
+        g.format = 'png'
+        res.content_type = 'image/png'
+        res.data = g.pipe()
+    return res
+
+@app.route('/story/<int:story_id>.png')
+def generate_png(story_id):
     print(request.url_rule)
     story = Story.query.get_or_404(story_id)
     res = Response()

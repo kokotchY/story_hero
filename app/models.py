@@ -86,6 +86,7 @@ class InstanceStory(db.Model):
         self.user_id = user_id
         self.current_step_id = current_step_id
         self.started = datetime.datetime.now()
+        self.finished = False
 
     def __repr__(self):
         return '<InstanceStory %r %r %r>' % (self.story_id, self.user_id, self.current_step_id)

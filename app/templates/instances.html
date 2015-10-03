@@ -9,6 +9,9 @@
 		<li>{{history.from_step_id}} to {{history.to_step_id}} @ {{history.timestamp}} by choosing <strong>{{history.choice_text}}</strong></li>
 		{% endfor %}
 	</ul>
+	{% if not instance.finished %}
+		<a href="{{url_for('show_instance', instance_id = instance.id)}}">Continue</a>
+	{% endif %}
 </li>
 {% endfor %}
 </ul>

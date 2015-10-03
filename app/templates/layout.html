@@ -46,6 +46,7 @@
 				<!-- Collect the nav links, forms, and other content for toggling -->
 				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 					<ul class="nav navbar-nav">
+						{{display_nav_link('stories', 'Stories', 'book')}}
 						{{display_nav_link('list_users', 'Users')}}
 					</ul>
 					<ul class="nav navbar-nav navbar-right">
@@ -57,6 +58,7 @@
 								<li><a href="#">Action</a></li>
 								<li><a href="#">Another action</a></li>
 								<li><a href="#">Something else here</a></li>
+								{{display_nav_link('instances', 'Instances')}}
 								<li role="separator" class="divider"></li>
 								{{display_nav_link('auth.logout', 'Logout', 'log-out')}}
 							</ul>
