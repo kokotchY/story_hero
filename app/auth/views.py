@@ -3,9 +3,9 @@
 
 from flask import render_template, redirect, url_for, flash, request, current_app
 from . import auth
-from .forms import LoginForm
+from .forms import LoginForm, RegisterForm
 from ..models import User
-from .. import login_manager
+from .. import login_manager, db
 from flask.ext.login import login_required, login_user, logout_user
 
 @auth.route('/login', methods=['GET', 'POST'])
@@ -43,3 +43,14 @@ def login_username(user):
             login_user(user_db) 
             return redirect(url_for('index'))
 
+@auth.route('/register', methods = ['GET', 'POST'])
+def register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        user = User(form.username.data, form.email.data)
+        user.password = form.password.data
+        db.session.add(user)
+        db.session.commit()
+        flash('Account created, you can login.')
+        return redirect(url_for('auth.login'))
+    return render_template('auth/register.html', form = form)
