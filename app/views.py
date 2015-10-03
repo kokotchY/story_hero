@@ -4,7 +4,7 @@
 from . import the_app as app
 from . import db
 from .models import User, Story, Step, InstanceStory, HistoryInstance
-from flask import render_template, request, redirect, url_for, flash, session, Response, send_file, abort
+from flask import render_template, request, redirect, url_for, flash, session, Response, abort
 import datetime
 from graphviz import Digraph
 from flask.ext.login import login_required
