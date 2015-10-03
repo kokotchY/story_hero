@@ -30,4 +30,6 @@ def create_app():
     db.init_app(app)
     the_app = app
     from . import views
+    from .auth import auth as auth_blueprint
+    app.register_blueprint(auth_blueprint, url_prefix='/auth')
     return app

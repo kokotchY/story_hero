@@ -2,20 +2,12 @@
 # -*- UTF-8 -*-
 
 from . import the_app as app
-from . import db, login_manager
+from . import db
 from .models import User, Story, Step, InstanceStory, HistoryInstance
 from flask import render_template, request, redirect, url_for, flash, session, Response, send_file, abort
 import datetime
 from graphviz import Digraph
-from flask_wtf import Form
-from wtforms import StringField, PasswordField, BooleanField
-from wtforms.validators import DataRequired
-from flask.ext.login import login_required, login_user, logout_user
-
-class LoginForm(Form):
-    username = StringField('Username', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    remember_me = BooleanField('Remember Me?')
+from flask.ext.login import login_required
 
 @app.route('/users/add', methods=['GET', 'POST'])
 def add_user():
@@ -147,14 +139,6 @@ def delete_step(step_id):
 def index():
     return render_template('index.html')
 
-@app.route('/login/<user>')
-def login_username(user):
-    if app.debug:
-        user_db = User.query.filter_by(username=user).first()
-        if user_db:
-            login_user(user_db) 
-            return redirect(url_for('index'))
-
 @app.route('/stories/<int:story_id>/start')
 def start_story(story_id):
     story = Story.query.get_or_404(story_id)
@@ -241,37 +225,10 @@ def generate_dot(story_id):
         res.data = g.pipe()
     return res
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(username = form.username.data).first()
-        if user and user.verify_password(form.password.data):
-            login_user(user, remember = form.remember_me.data)
-
-            flash('Logged in successfully.')
-
-            next = request.args.get('next')
-
-            return redirect(next or url_for('index'))
-        else:
-            flash('Unknown user or password')
-    return render_template('login.html', form=form)
-
 @app.route('/settings')
 @login_required
 def settings():
     return render_template('settings.html')
-
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for('index'))
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(user_id)
 
 @app.route('/debug')
 def debug():
