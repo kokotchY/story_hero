@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block content %}
+<form action="{{url_for('login')}}" method="post">
+	{{ form.csrf_token }}
+	{{ form.username.label }} {{ form.username() }}
+	<br />
+	{{ form.password.label }} {{ form.password() }}
+	<br />
+	{{ form.remember_me.label }} {{ form.remember_me() }}
+	<br />
+	<button>Login</button>
+</form>
+{% endblock %}

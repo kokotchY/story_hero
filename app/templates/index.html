@@ -1,11 +1,13 @@
 {% extends "layout.html" %}
 {% block content %}
-Hello <br />
+{% if current_user.is_authenticated %}
+	Hi {{ current_user.username }}! <a href="{{url_for('logout')}}">Logout</a>
+{% endif %}
 Login as
 <ul>
 	{% for user in users %}
 	<li>
-		<a href="{{url_for('login', user = user.username)}}">{{user.username}}</a>
+		<a href="{{url_for('login_username', user = user.username)}}">{{user.username}}</a>
 	</li>
 	{% endfor %}
 </ul>

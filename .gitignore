@@ -3,3 +3,4 @@ __pycache__
 *.pyc
 story_hero
 app/graphs/*
+flask_session/*
