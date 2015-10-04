@@ -4,7 +4,8 @@
 from . import the_app as app
 from . import db
 from .models import User, Story, Step, InstanceStory, HistoryInstance
-from flask import render_template, request, redirect, url_for, flash, session, Response, abort
+from flask import render_template, request, redirect, url_for, flash, session, Response, abort, Markup
+import markdown
 import datetime
 from graphviz import Digraph
 from flask.ext.login import login_required
@@ -179,7 +180,8 @@ def show_instance(instance_id, choice = None):
                     instance.finished = True
                 db.session.add(history)
                 db.session.commit()
-        return render_template('/steps/play.html', story = instance.story, step = step, instance_id = instance_id)
+        content = Markup(markdown.markdown(step.content))
+        return render_template('/steps/play.html', content = content, story = instance.story, step = step, instance_id = instance_id)
     else:
         return 'This is not your story! %s != %s' % (str(type(instance.user_id)), str(type(session['user_id'])))
 
