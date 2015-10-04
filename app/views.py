@@ -10,6 +10,13 @@ import datetime
 from graphviz import Digraph
 from flask.ext.login import login_required
 
+from flask_wtf import Form
+from wtforms import TextAreaField, validators, ValidationError
+from wtforms.validators import DataRequired
+
+class BulkAddStepForm(Form):
+    steps = TextAreaField('Steps', validators = [DataRequired()])
+
 @app.route('/users/add', methods=['GET', 'POST'])
 def add_user():
     if request.method == 'POST':
@@ -344,3 +351,18 @@ def display_history_png(instance_id):
     res.content_type = "image/png"
     res.data = g.pipe()
     return res
+
+@app.route('/stories/<int:story_id>/bulk_add_step', methods = ['GET', 'POST'])
+def add_bulk_steps(story_id):
+    form = BulkAddStepForm()
+    if form.validate_on_submit():
+        content = form.steps.data
+        for line in content.split("\n"):
+            sep_pos = line.strip().find(':')
+            step_name = line[:sep_pos]
+            step_content = line[sep_pos+1:].strip()
+            new_step = Step(step_name, step_content, story_id)
+            db.session.add(new_step)
+        db.session.commit()
+        return redirect(url_for('show_story', story_id = story_id))
+    return render_template('stories/bulk_add_step.html', story_id = story_id, form = form)
