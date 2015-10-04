@@ -361,3 +361,7 @@ def add_bulk_steps(story_id):
         db.session.commit()
         return redirect(url_for('show_story', story_id = story_id))
     return render_template('stories/bulk_add_step.html', story_id = story_id, form = form)
+
+@app.template_filter('markdown')
+def markdown_filter(content):
+    return Markup(markdown.markdown(content))
