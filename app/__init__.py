@@ -34,6 +34,9 @@ def create_app():
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
 
+    if app.debug:
+        app.jinja_env.exception_formatter = format_exception
+
     @app.url_defaults
     def hashed_url_for_static_file(endpoint, values):
         if 'static' == endpoint or endpoint.endswith('.static'):
@@ -54,6 +57,12 @@ def create_app():
                     param_name = '_' + param_name
                 values[param_name] = static_file_hash(os.path.join(static_folder, filename))
     return app
+
+def format_exception(tb):
+    res = make_response(tb.render_as_text())
+    res.content_type = 'text/plain'
+    return res
+
 
 def static_file_hash(filename):
     return int(os.stat(filename).st_mtime)
