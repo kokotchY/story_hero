@@ -52,10 +52,12 @@ def create_app():
                 else:
                     blueprint = request.blueprint
 
-                if blueprint:
-                    static_folder = the_app.blueprints[blueprint].static_folder
-                else:
-                    static_folder = the_app.static_folder
+                #if blueprint:
+                    #print("From blueprint")
+                    #static_folder = the_app.blueprints[blueprint].static_folder
+                #else:
+                    #static_folder = the_app.static_folder
+                static_folder = the_app.static_folder
 
                 param_name = 'h'
                 while param_name in values:
