@@ -4,18 +4,13 @@
 from . import the_app as app
 from . import db
 from .models import User, Story, Step, InstanceStory, HistoryInstance
+from .forms import BulkAddStepForm
 from flask import render_template, request, redirect, url_for, flash, session, Response, abort, Markup
 import markdown
 import datetime
 from graphviz import Digraph
 from flask.ext.login import login_required
 
-from flask_wtf import Form
-from wtforms import TextAreaField, validators, ValidationError
-from wtforms.validators import DataRequired
-
-class BulkAddStepForm(Form):
-    steps = TextAreaField('Steps', validators = [DataRequired()])
 
 @app.route('/users/add', methods=['GET', 'POST'])
 def add_user():
