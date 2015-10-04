@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block content %}
+<form action="{{url_for('edit_user', user_id = user.id)}}" method="post">
+	<div class="form-group">
+		{{form.username.label}}
+		{{form.username(class="form-control")}}
+	</div>
+	<div class="form-group">
+		{{form.email.label}}
+		{{form.email(class="form-control")}}
+	</div>
+	<div class="form-group">
+		{{form.password.label}}
+		{{form.password(class="form-control")}}
+	</div>
+	<div class="form-group">
+		{{form.confirm.label}}
+		{{form.confirm(class="form-control")}}
+	</div>
+	<div class="form-group">
+		{{form.role_id.label}}
+		{{form.role_id(class="form-control")}}
+	</div>
+	<div>
+		<button class="btn btn-primary">Save</button>
+	</div>
+</form>
+{% endblock %}
