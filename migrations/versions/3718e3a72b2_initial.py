@@ -46,10 +46,21 @@ def upgrade():
     sa.Column('username', sa.String(length=80), nullable=True),
     sa.Column('password_hash', sa.String(length=128)),
     sa.Column('email', sa.String(length=120), nullable=True),
+    sa.Column('role_id', sa.Integer(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
-    sa.UniqueConstraint('username')
+    sa.UniqueConstraint('username'),
+    sa.ForeignKeyConstraint(['role_id'], ['role.id'], )
     )
+    op.create_table('role',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(length=64), nullable=True),
+    sa.Column('default', sa.Boolean(), nullable=True),
+    sa.Column('permissions', sa.Integer(), nullable=True),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('name')
+    )
+    op.create_index(op.f('ix_role_default'), 'role', ['default'], unique=False)
     ### end Alembic commands ###
 
 
@@ -58,4 +69,6 @@ def downgrade():
     op.drop_table('user')
     op.drop_table('story')
     op.drop_table('step')
+    op.drop_index(op.f('ix_role_default'), table_name='role')
+    op.drop_table('role')
     ### end Alembic commands ###

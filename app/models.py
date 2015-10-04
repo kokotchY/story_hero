@@ -3,8 +3,9 @@
 
 from . import db
 import datetime
-from flask.ext.login import UserMixin
+from flask.ext.login import UserMixin, AnonymousUserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask import current_app
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -13,13 +14,25 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True)
     stories = db.relationship('Story', backref='user', lazy='joined')
     instances = db.relationship('InstanceStory', backref='user', lazy='dynamic')
+    role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
 
     def __init__(self, username, email):
         self.username = username
         self.email = email
+        if self.role is None:
+            if self.email == current_app.config['STORY_HERO_ADMIN']:
+                self.role = Role.query.filter_by(permissions=0xff).first()
+            if self.role is None:
+                self.role = Role.query.filter_by(default=True).first()
 
     def __repr__(self):
         return '<User %r>' % self.username
+
+    def can(self, permissions):
+        return self.role is not None and (self.role.permissions & permissions) == permissions
+
+    def is_administrator(self):
+        return self.can(Permission.ADMINISTER)
 
     @property
     def password(self):
@@ -31,6 +44,13 @@ class User(db.Model, UserMixin):
 
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+class AnonymousUser(AnonymousUserMixin):
+    def can(self, permissions):
+        return False
+
+    def is_administrator(self):
+        return False
 
 class Step(db.Model):
     id = db.Column(db.Integer, primary_key = True)
@@ -105,3 +125,35 @@ class HistoryInstance(db.Model):
         self.to_step_id = to_step_id
         self.choice_text = choice_text
         self.timestamp = datetime.datetime.now()
+
+class Role(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), unique=True)
+    default = db.Column(db.Boolean, default=False, index=True)
+    permissions = db.Column(db.Integer)
+    users = db.relationship('User', backref='role', lazy='dynamic')
+
+    def __repr__(self):
+        return '<Role %r>' % self.name
+
+    @staticmethod
+    def insert_roles():
+        roles = {
+            'User': (Permission.PLAY_STORY, True),
+            'Writer': (Permission.PLAY_STORY | Permission.CREATE_STORY, False),
+            'Administrator': (0xFF, False)
+        }
+
+        for r in roles:
+            role = Role.query.filter_by(name=r).first()
+            if role is None:
+                role = Role(name=r)
+            role.permissions = roles[r][0]
+            role.default = roles[r][1]
+            db.session.add(role)
+        db.session.commit()
+
+class Permission(object):
+    PLAY_STORY = 0x01
+    CREATE_STORY = 0x02
+    ADMINISTER = 0x80

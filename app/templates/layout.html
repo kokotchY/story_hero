@@ -1,14 +1,14 @@
 {% macro display_nav_link(target, label, icon=None) %}
 {% if request.url_rule.endpoint == target %}
 <li class="active">
-	<a href="{{url_for(target)}}">
+	<a href="{{url_for(target, **kwargs)}}">
 		{% if icon %}{{display_icon(icon)}}{% endif %}
 		{{label}} <span class="sr-only">(current)</span>
 	</a>
 </li>
 {% else %}
 <li>
-	<a href="{{url_for(target)}}">
+	<a href="{{url_for(target, **kwargs)}}">
 		{% if icon %}{{display_icon(icon)}}{% endif %}
 		{{label}}
 	</a>
@@ -47,14 +47,21 @@
 				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 					<ul class="nav navbar-nav">
 						{{display_nav_link('stories', 'Stories', 'book')}}
-						{{display_nav_link('list_users', 'Users')}}
+						{% if current_user.can(Permission.CREATE_STORY) %}
+						{{display_nav_link('new_story', 'Create story', 'pencil')}}
+						{% endif %}
 					</ul>
 					<ul class="nav navbar-nav navbar-right">
 						{% if current_user.is_authenticated %}
+						{% if current_user.is_administrator() %}
+						{{display_nav_link('list_users', 'Users', 'list')}}
+						{% endif %}
 						<li class="dropdown">
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+								{% if current_user.is_administrator() %}{{display_icon('flash')}}{% endif %}
 								{{display_icon('user')}} {{session['username']}}<span class="caret"></span></a>
 							<ul class="dropdown-menu">
+								{{display_nav_link('show_user', 'My profile', user_id = session['user_id'])}}
 								{{display_nav_link('instances', 'Instances')}}
 								<li role="separator" class="divider"></li>
 								{{display_nav_link('auth.logout', 'Logout', 'log-out')}}
@@ -73,6 +80,8 @@
 			{% for category, message in get_flashed_messages(with_categories=true) %}
 			{% if category == "info" %}
 			{% set alert_class = "info" %}
+			{% elif category == "warning" %}
+			{% set alert_class = "warning" %}
 			{% elif category == "error" %}
 			{% set alert_class = "danger" %}
 			{% else %}
@@ -82,7 +91,7 @@
 				<button type="button" class="close" data-dismiss="alert" aria-close="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
-				{{message}}
+				{{message|safe}}
 			</div>
 			{% endfor %}
 		</div>

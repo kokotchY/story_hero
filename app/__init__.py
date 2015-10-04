@@ -10,8 +10,12 @@ import os
 db = SQLAlchemy()
 toolbar = DebugToolbarExtension()
 session = Session()
+
+from .models import AnonymousUser, Permission
+
 login_manager = LoginManager()
-login_manager.login_view = "login"
+login_manager.login_view = "auth.login"
+login_manager.anonymous_user = AnonymousUser
 
 the_app = None
 
@@ -24,6 +28,7 @@ def create_app():
     app.config['SQLALCHEMY_ECHO'] = False
     app.config['SESSION_TYPE'] = 'filesystem'
     app.config['SESSION_USE_SIGNER'] = True
+    app.config['STORY_HERO_ADMIN'] = 'kokotchy@gmail.com'
     toolbar.init_app(app)
     session.init_app(app)
     login_manager.init_app(app)
@@ -56,6 +61,10 @@ def create_app():
                 while param_name in values:
                     param_name = '_' + param_name
                 values[param_name] = static_file_hash(os.path.join(static_folder, filename))
+
+    @app.context_processor
+    def inject_permissions():
+        return dict(Permission = Permission)
     return app
 
 def format_exception(tb):
