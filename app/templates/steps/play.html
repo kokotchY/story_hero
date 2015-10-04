@@ -1,22 +1,40 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1>Story: {{story.name}}</h1>
-<div>
-	<div>{{step.name}} ({{step.id}})</div>
-	<div>{{content}}</div>
-	{% if not step.final %}
-	{% if step.first_choice_step_id %}
-	<div>First choice:
-		<a href="{{url_for('show_instance', instance_id = instance_id, choice = 1)}}">{{step.first_choice}}</a>
+<div class="step-play panel panel-default">
+	<div class="panel-heading">
+		{{story.name}} <small>({{step.name}})</small>
 	</div>
-	{% endif %}
-	{% if step.second_choice_step_id %}
-	<div>Second choice:
-		<a href="{{url_for('show_instance', instance_id = instance_id, choice = 2)}}">{{step.second_choice}}</a>
+	<div class="panel-body">
+		{{content}}
+		{% if not step.final %}
+			{% if step.first_choice_step_id and step.second_choice_step_id %}
+			<div class="row show-grid">
+				{% if step.first_choice_step_id %}
+				<div class="col-md-6 choice">First choice:
+					<a href="{{url_for('show_instance', instance_id = instance_id, choice = 1)}}">{{step.first_choice}}</a>
+				</div>
+				{% endif %}
+				{% if step.second_choice_step_id %}
+				<div class="col-md-6 choice">Second choice:
+					<a href="{{url_for('show_instance', instance_id = instance_id, choice = 2)}}">{{step.second_choice}}</a>
+				</div>
+				{% endif %}
+			</div>
+			{% else %}
+			<div class="choice">
+				{% if step.first_choice_step_id %}
+					<a href="{{url_for('show_instance', instance_id = instance_id, choice = 1)}}">{{step.first_choice}}</a>
+				{% endif %}
+				{% if step.second_choice_step_id %}
+					<a href="{{url_for('show_instance', instance_id = instance_id, choice = 2)}}">{{step.second_choice}}</a>
+				{% endif %}
+			</div>
+			{% endif %}
+		{% else %}
+			<div class="choice">
+				<strong>End of the story!</strong>
+			</div>
+		{% endif %}
 	</div>
-	{% endif %}
-	{% else %}
-		<strong>End of the story!</strong>
-	{% endif %}
 </div>
 {% endblock %}
