@@ -4,3 +4,4 @@ __pycache__
 story_hero
 app/graphs/*
 flask_session/*
+app/static/bootstrap-3.3.5-dist/
