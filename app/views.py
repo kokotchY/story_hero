@@ -258,3 +258,15 @@ def debug():
     if app.debug:
         return render_template('debug.html', users = User.query.all(), urls = app.url_map)
     return abort(404)
+
+@app.route('/shutdown', methods=['POST'])
+def shutdown():
+    assert app.debug == True
+    shutdown_server()
+    return 'Server shutting down...'
+
+def shutdown_server():
+    func = request.environ.get('werkzeug.server.shutdown')
+    if func is None:
+        raise RuntimeError('Not running with the Werkzeug Server')
+    func()
