@@ -23,7 +23,7 @@ def login():
 
             return redirect(next or url_for('index'))
         else:
-            flash('Unknown user or password')
+            flash('Unknown user or password', 'error')
     return render_template('auth/login.html', form=form)
 
 @auth.route('/logout')

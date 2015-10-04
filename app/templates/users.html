@@ -1,13 +1,5 @@
 {% extends "layout.html" %}
 {% block content %}
-		{% if get_flashed_messages() %}
-		{% for message in get_flashed_messages() %}
-		<div class="alert alert-warning">
-			<button type="button" class="close" data-dismiss="alert">&times;</button>
-			{{ message }}
-		</div>
-		{% endfor %}
-		{% endif %}
 		<div>
 			<table class="table">
 				<tr>
