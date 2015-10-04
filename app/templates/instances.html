@@ -44,22 +44,4 @@
 		</ul>
 	</div>
 </div>
-<ul>
-{% for instance in instances %}
-<li><strong>{{instance.story.name}}</strong> started by {{instance.user.username}} @ {{instance.started}} and finished {{instance.finished_timestamp}} (<a href="{{url_for('delete_instance', instance_id = instance.id)}}">Delete</a>):
-	<ul>
-		{% for history in instance.history.order_by(HistoryInstance.timestamp.asc()) %}
-		{% if history.from_step_id %}
-		<li>{{history.from_step_id}} to {{history.to_step_id}} @ {{history.timestamp}} by choosing <strong>{{history.choice_text}}</strong></li>
-		{% else %}
-		<li>Start at {{history.to_step_id}} @ {{history.timestamp}}</li>
-		{% endif %}
-		{% endfor %}
-	</ul>
-	{% if not instance.finished %}
-		<a href="{{url_for('show_instance', instance_id = instance.id)}}">Continue</a>
-	{% endif %}
-</li>
-{% endfor %}
-</ul>
 {% endblock %}
