@@ -1,12 +1,59 @@
 {% extends "layout.html" %}
+{% macro display_instance(instance) %}
+<li class="list-group-item"><strong>{{instance.story.name}}</strong> started by {{instance.user.username}} @ {{instance.started}} 
+	{% if instance.finished %}and finished {{instance.finished_timestamp}} {% endif %}(<a href="{{url_for('delete_instance', instance_id = instance.id)}}">Delete</a>), <a href="{{url_for('display_history', instance_id = instance.id)}}">{{display_icon('film')}} Display history</a>:
+	<ul>
+		{% for history in instance.history.order_by(HistoryInstance.timestamp.asc()) %}
+		{% if history.from_step_id %}
+		<li>{{history.from_step_id}} to {{history.to_step_id}} @ {{history.timestamp}} by choosing <strong>{{history.choice_text}}</strong></li>
+		{% else %}
+		<li>Start at {{history.to_step_id}} @ {{history.timestamp}}</li>
+		{% endif %}
+		{% endfor %}
+	</ul>
+	{% if not instance.finished %}
+		<a href="{{url_for('show_instance', instance_id = instance.id)}}">{{display_icon('play')}} Continue</a>
+	{% endif %}
+</li>
+{% endmacro %}
 {% block content %}
-<h1>Instances</h1>
+<div class="page-header">
+	<h1>Instances</h1>
+</div>
+<div class="panel panel-default">
+	<div class="panel-heading">Ongoing instances</div>
+	<div class="panel-body">
+		<ul class="list-group">
+			{% for instance in instances %}
+			{% if not instance.finished %}
+			{{display_instance(instance)}}
+			{% endif %}
+			{% endfor %}
+		</ul>
+	</div>
+</div>
+<div class="panel panel-default">
+	<div class="panel-heading">Finished instances</div>
+	<div class="panel-body">
+		<ul class="list-group">
+			{% for instance in instances %}
+			{% if instance.finished %}
+			{{display_instance(instance)}}
+			{% endif %}
+			{% endfor %}
+		</ul>
+	</div>
+</div>
 <ul>
 {% for instance in instances %}
 <li><strong>{{instance.story.name}}</strong> started by {{instance.user.username}} @ {{instance.started}} and finished {{instance.finished_timestamp}} (<a href="{{url_for('delete_instance', instance_id = instance.id)}}">Delete</a>):
 	<ul>
-		{% for history in instance.history %}
+		{% for history in instance.history.order_by(HistoryInstance.timestamp.asc()) %}
+		{% if history.from_step_id %}
 		<li>{{history.from_step_id}} to {{history.to_step_id}} @ {{history.timestamp}} by choosing <strong>{{history.choice_text}}</strong></li>
+		{% else %}
+		<li>Start at {{history.to_step_id}} @ {{history.timestamp}}</li>
+		{% endif %}
 		{% endfor %}
 	</ul>
 	{% if not instance.finished %}

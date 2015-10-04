@@ -79,7 +79,7 @@ class InstanceStory(db.Model):
     finished = db.Column(db.Boolean)
     started = db.Column(db.DateTime)
     finished_timestamp = db.Column(db.DateTime)
-    history = db.relationship('HistoryInstance', backref='instance', lazy='joined')
+    history = db.relationship('HistoryInstance', backref='instance', lazy='dynamic')
 
     def __init__(self, story_id, user_id, current_step_id):
         self.story_id = story_id

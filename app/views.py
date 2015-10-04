@@ -174,7 +174,7 @@ def show_instance(instance_id, choice = None):
                 choice_text = step.second_choice
                 step = Step.query.get_or_404(step.second_choice_step_id)
                 history = HistoryInstance(instance.id, from_step_id, step.id, choice_text)
-                instance.current_step_id = step.second_choice_step_id
+                instance.current_step_id = step.id
                 if step.final:
                     instance.finished_timestamp = datetime.datetime.now()
                     instance.finished = True
@@ -193,7 +193,7 @@ def stories():
 @app.route('/instances')
 def instances():
     instances = InstanceStory.query.filter_by(user_id = session['user_id']).all()
-    return render_template('instances.html', instances = instances)
+    return render_template('instances.html', instances = instances, HistoryInstance = HistoryInstance)
 
 @app.route('/instances/<int:instance_id>/delete')
 def delete_instance(instance_id):
@@ -272,3 +272,75 @@ def shutdown_server():
     if func is None:
         raise RuntimeError('Not running with the Werkzeug Server')
     func()
+
+@app.route('/story/<int:story_id>/set_init/<int:step_id>')
+def set_initial_step(story_id, step_id):
+    story = Story.query.get_or_404(story_id)
+    step = Step.query.get_or_404(step_id)
+    if step.story_id == story.id:
+        story.initial_step_id = step.id
+        db.session.commit()
+        flash('The initial step of the story %d have been changed.' % story.id, 'info')
+    else:
+        flash('The step %d is not a step of story %d' % (step.id, story.id), 'error')
+    return redirect(url_for('show_story', story_id = story.id))
+
+@app.route('/story/<int:story_id>/remove_init/<int:step_id>')
+def remove_initial_step(story_id, step_id):
+    story = Story.query.get_or_404(story_id)
+    step = Step.query.get_or_404(step_id)
+    if step.story_id == story.id and story.initial_step_id == step.id:
+        story.initial_step_id = None
+        db.session.commit()
+        flash('The initial step of the story %d have been removed.' % story.id, 'info')
+    else:
+        flash('The step %d is not a step of story %d or the initial step of story %d' % (step.id, story.id, story.id), 'error')
+    return redirect(url_for('show_story', story_id = story.id))
+
+@app.route('/instance/<int:instance_id>/history')
+def display_history(instance_id):
+    instance = InstanceStory.query.get_or_404(instance_id)
+    return render_template('instance_history.html', instance = instance)
+
+@app.route('/instance/history-<int:instance_id>.png')
+def display_history_png(instance_id):
+    instance = InstanceStory.query.get_or_404(instance_id)
+    histories = instance.history.order_by(HistoryInstance.timestamp.asc()).all()
+    res = Response()
+    g = Digraph(instance.story.name)
+    step_ids = []
+    for history in histories:
+        if history.from_step_id and not history.from_step_id in step_ids:
+            step_ids.append(history.from_step_id)
+        if history.to_step_id and not history.to_step_id in step_ids:
+            step_ids.append(history.to_step_id)
+
+    steps_tmp = Step.query.filter(Step.id.in_(step_ids))
+    steps = {}
+    for step in steps_tmp:
+        steps[step.id] = step
+
+    for history in histories:
+        if history.from_step_id and not history.from_step_id in steps:
+            step = Step.query.get(history.from_step_id)
+            steps[history.from_step_id] = step
+        if history.to_step_id and not history.to_step_id in steps:
+            step = Step.query.get(history.to_step_id)
+            steps[history.to_step_id] = step
+    for step_id in steps:
+        step = steps[step_id]
+        if step.final:
+            g.node('step_%d' % step.id, label=step.name, color="lightblue2", style="filled")
+        else:
+            g.node('step_%d' % step.id, label=step.name)
+
+    index = 1
+    for history in histories:
+        if history.from_step_id:
+            g.edge('step_%d' % history.from_step_id, 'step_%d' % history.to_step_id, label = "%d. %s" % (index, history.choice_text))
+            index += 1
+
+    g.format = 'png'
+    res.content_type = "image/png"
+    res.data = g.pipe()
+    return res

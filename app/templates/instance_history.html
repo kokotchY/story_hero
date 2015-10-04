@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="page-header">
+<h1>
+	History of an instance of {{instance.story.name}}
+</h1>
+</div>
+<img src="{{url_for('display_history_png', instance_id = instance.id)}}" alt="History" />
+{% endblock %}
