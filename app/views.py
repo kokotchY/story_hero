@@ -3,7 +3,7 @@
 
 from . import the_app as app
 from . import db
-from .models import User, Story, Step, InstanceStory, HistoryInstance, Role
+from .models import User, Story, Step, InstanceStory, HistoryInstance, Role, Permission
 from .forms import BulkAddStepForm, EditUserForm
 from .decorators import admin_required, permission_required
 from flask import render_template, request, redirect, url_for, flash, session, Response, abort, Markup
@@ -57,6 +57,7 @@ def display_stories(user_id):
 
 @app.route('/stories/<int:user_id>/new', methods=['GET', 'POST'])
 @app.route('/stories/new', methods=['GET', 'POST'])
+@permission_required(Permission.CREATE_STORY)
 def new_story(user_id = None):
     if user_id is None:
         user_id = current_user.id
