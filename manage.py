@@ -17,6 +17,7 @@ manager.add_command("db", MigrateCommand)
 
 @manager.command
 def init():
+    'Define some defaults for the database'
     user = User('kokotchy', 'address@host.com')
     user.password = 'pass'
     db.session.add(user)
@@ -28,6 +29,7 @@ def init():
 
 @manager.command
 def list_routes():
+    "List all available routes"
     import urllib
     output = []
     for rule in app.url_map.iter_rules():
