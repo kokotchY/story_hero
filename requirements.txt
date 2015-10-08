@@ -8,3 +8,4 @@ flask-session
 flask-login
 flask-wtf
 markdown
+Flask-MySQLdb
