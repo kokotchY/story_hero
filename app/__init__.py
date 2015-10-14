@@ -41,8 +41,8 @@ def create_app(configname=None):
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
 
-    if app.debug:
-        app.jinja_env.exception_formatter = format_exception
+    #if app.debug:
+        #app.jinja_env.exception_formatter = format_exception
 
     @app.url_defaults
     def hashed_url_for_static_file(endpoint, values):
