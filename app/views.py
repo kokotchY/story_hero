@@ -215,7 +215,6 @@ def delete_instance(instance_id):
 
 @app.route('/story/<int:story_id>.dot')
 def generate_dot(story_id):
-    print(request.url_rule)
     story = Story.query.get_or_404(story_id)
     res = Response()
     g = Digraph(story.name)
@@ -239,7 +238,6 @@ def generate_dot(story_id):
 
 @app.route('/story/<int:story_id>.png')
 def generate_png(story_id):
-    print(request.url_rule)
     story = Story.query.get_or_404(story_id)
     res = Response()
     g = Digraph(story.name)
