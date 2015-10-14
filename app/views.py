@@ -6,11 +6,12 @@ from . import db
 from .models import User, Story, Step, InstanceStory, HistoryInstance, Role, Permission
 from .forms import BulkAddStepForm, EditUserForm
 from .decorators import admin_required, permission_required
-from flask import render_template, request, redirect, url_for, flash, session, Response, abort, Markup
+from flask import render_template, request, redirect, url_for, flash, session, Response, abort, Markup, current_app
 import markdown
 import datetime
 from graphviz import Digraph
 from flask.ext.login import login_required, current_user
+from flask.ext.sqlalchemy import get_debug_queries
 
 
 @app.route('/users/add', methods=['GET', 'POST'])
@@ -407,3 +408,11 @@ def edit_user(user_id):
         else:
             flash('No modification have been detected for user %s' % user.username, "warning")
     return render_template('users/edit.html', user = user, form = form)
+
+@app.after_request
+def after_request(response):
+    for query in get_debug_queries():
+        if query.duration >= current_app.config['STORY_HERO_SLOW_DB_QUERY_TIME']:
+            current_app.logger.warning(
+                    'Slow query:%s\nParameters: %s\nDuration: %fs\nContext: %s\n' % (query.statement, query.parameters, query.duration, query.content))
+    return response

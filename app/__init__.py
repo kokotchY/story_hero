@@ -31,6 +31,7 @@ def create_app(configname=None):
         raise Exception('Impossible to activate the SESSION_SIGNER with python 3')
     app.config['STORY_HERO_ADMIN'] = 'kokotchy@gmail.com'
     app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
+    app.config['STORY_HERO_SLOW_DB_QUERY_TIME'] = 0.5
     session.init_app(app)
     login_manager.init_app(app)
 
