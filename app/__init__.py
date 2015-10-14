@@ -16,10 +16,7 @@ login_manager = LoginManager()
 login_manager.login_view = "auth.login"
 login_manager.anonymous_user = AnonymousUser
 
-the_app = None
-
 def create_app(configname=None):
-    global the_app
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/flask/test.db'
     app.config['DEBUG'] = True
@@ -34,10 +31,11 @@ def create_app(configname=None):
     app.config['STORY_HERO_SLOW_DB_QUERY_TIME'] = 0.5
     session.init_app(app)
     login_manager.init_app(app)
-
     db.init_app(app)
-    the_app = app
-    from . import views
+
+    from .main import main as main_blueprint
+    app.register_blueprint(main_blueprint)
+
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
 
@@ -59,7 +57,7 @@ def create_app(configname=None):
                     #static_folder = the_app.blueprints[blueprint].static_folder
                 #else:
                     #static_folder = the_app.static_folder
-                static_folder = the_app.static_folder
+                static_folder = app.static_folder
 
                 param_name = 'h'
                 while param_name in values:

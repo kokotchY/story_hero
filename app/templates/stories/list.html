@@ -3,9 +3,9 @@
 		<h2>Stories of user {{user.username}}</h2>
 		<ul>
 			{% for story in stories %}
-			<li><a href="{{url_for('show_story', story_id = story.id)}}">{{story.name}}</a> with {{story.steps | length}} steps ({{story.timestamp}})</li>
+			<li><a href="{{url_for('.show_story', story_id = story.id)}}">{{story.name}}</a> with {{story.steps | length}} steps ({{story.timestamp}})</li>
 			{% endfor %}
 		</ul>
 
-		<a href="{{url_for('new_story', user_id = user.id)}}">New story</a>
+		<a href="{{url_for('.new_story', user_id = user.id)}}">New story</a>
 {% endblock %}

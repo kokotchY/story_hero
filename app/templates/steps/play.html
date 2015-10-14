@@ -11,22 +11,22 @@
 			<div class="row show-grid">
 				{% if step.first_choice_step_id %}
 				<div class="col-md-6 choice">First choice:
-					<a href="{{url_for('show_instance', instance_id = instance_id, choice = 1)}}">{{step.first_choice}}</a>
+					<a href="{{url_for('.show_instance', instance_id = instance_id, choice = 1)}}">{{step.first_choice}}</a>
 				</div>
 				{% endif %}
 				{% if step.second_choice_step_id %}
 				<div class="col-md-6 choice">Second choice:
-					<a href="{{url_for('show_instance', instance_id = instance_id, choice = 2)}}">{{step.second_choice}}</a>
+					<a href="{{url_for('.show_instance', instance_id = instance_id, choice = 2)}}">{{step.second_choice}}</a>
 				</div>
 				{% endif %}
 			</div>
 			{% else %}
 			<div class="choice">
 				{% if step.first_choice_step_id %}
-					<a href="{{url_for('show_instance', instance_id = instance_id, choice = 1)}}">{{step.first_choice}}</a>
+					<a href="{{url_for('.show_instance', instance_id = instance_id, choice = 1)}}">{{step.first_choice}}</a>
 				{% endif %}
 				{% if step.second_choice_step_id %}
-					<a href="{{url_for('show_instance', instance_id = instance_id, choice = 2)}}">{{step.second_choice}}</a>
+					<a href="{{url_for('.show_instance', instance_id = instance_id, choice = 2)}}">{{step.second_choice}}</a>
 				{% endif %}
 			</div>
 			{% endif %}

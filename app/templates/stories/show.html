@@ -27,31 +27,31 @@
 			{% set line_style = None %}
 			{% endif %}
 			<tr {% if line_style %}class="{{line_style}}"{%endif%}>
-				<td><a href="{{url_for('show_step', step_id = step.id)}}">{{step.name}}</a></td>
+				<td><a href="{{url_for('.show_step', step_id = step.id)}}">{{step.name}}</a></td>
 				<td>{{step.first_choice}}</td>
 				<td>{{step.first_choice_step_id}}</td>
 				<td>{{step.second_choice}}</td>
 				<td>{{step.second_choice_step_id}}</td>
 				<td>{{step.final}}</td>
 				<td>
-					<a href="{{url_for('edit_step', step_id = step.id)}}">Edit {{display_icon('edit')}}</a><br />
-					<a href="{{url_for('delete_step', step_id = step.id)}}">Delete {{display_icon('remove')}}</a><br />
+					<a href="{{url_for('.edit_step', step_id = step.id)}}">Edit {{display_icon('edit')}}</a><br />
+					<a href="{{url_for('.delete_step', step_id = step.id)}}">Delete {{display_icon('remove')}}</a><br />
 					{% if step.id == story.initial_step_id %}
-					<a href="{{url_for('remove_initial_step', step_id = step.id, story_id = story.id)}}">Remove initial step {{display_icon('remove')}}</a>
+					<a href="{{url_for('.remove_initial_step', step_id = step.id, story_id = story.id)}}">Remove initial step {{display_icon('remove')}}</a>
 					{% else %}
-					<a href="{{url_for('set_initial_step', step_id = step.id, story_id = story.id)}}">Set initial step {{display_icon('ok')}}</a>
+					<a href="{{url_for('.set_initial_step', step_id = step.id, story_id = story.id)}}">Set initial step {{display_icon('ok')}}</a>
 					{% endif %}
 				</td>
 			</tr>
 		{% endfor %}
 		<tr>
 			<td colspan="7">
-				<a href="{{url_for('new_step', story_id = story.id)}}">{{display_icon('plus')}} New step</a>
+				<a href="{{url_for('.new_step', story_id = story.id)}}">{{display_icon('plus')}} New step</a>
 			</td>
 		<tr>
 		</tr>
 			<td colspan="7">
-				<a href="{{url_for('add_bulk_steps', story_id = story.id)}}">{{display_icon('plus')}} Add bulk steps</a>
+				<a href="{{url_for('.add_bulk_steps', story_id = story.id)}}">{{display_icon('plus')}} Add bulk steps</a>
 			</td>
 		</tr>
 		</table>
@@ -64,7 +64,7 @@
 		<ul>
 		{% for instance in instances %}
 		<li>
-			<a href="{{url_for('show_instance', instance_id = instance.id)}}">{{instance.user.username}} @ {{instance.started}}</a>
+			<a href="{{url_for('.show_instance', instance_id = instance.id)}}">{{instance.user.username}} @ {{instance.started}}</a>
 		</li>
 		{% endfor %}
 		</ul>
@@ -75,7 +75,7 @@
 		Story schema
 	</div>
 	<div class="panel-body">
-		<img src="{{url_for('generate_png', story_id = story.id)}}" alt="Schema of story {{story.id}}" />
+		<img src="{{url_for('.generate_png', story_id = story.id)}}" alt="Schema of story {{story.id}}" />
 	</div>
 </div>
 {% endblock %}
