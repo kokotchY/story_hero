@@ -18,14 +18,16 @@ manager.add_command("db", MigrateCommand)
 @manager.command
 def init():
     'Define some defaults for the database'
+    Role.insert_roles()
+    role = Role.query.filter_by(name='Administrator').first()
     user = User('kokotchy', 'address@host.com')
     user.password = 'pass'
+    user.role = role
     db.session.add(user)
     db.session.commit()
     story = Story('This is a story', user.id)
     db.session.add(story)
     db.session.commit()
-    Role.insert_roles()
 
 @manager.command
 def list_routes():
