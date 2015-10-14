@@ -28,7 +28,7 @@ def add_user():
 
 @app.route('/users/<int:user_id>')
 def show_user(user_id):
-    user = User.query.filter_by(id=user_id).first()
+    user = User.query.get_or_404(user_id)
     return render_template('users/show.html', user = user)
 
 @app.route('/users')
@@ -40,21 +40,17 @@ def list_users():
 
 @app.route('/users/delete/<int:user_id>')
 def delete_user(user_id):
-    user = User.query.filter_by(id = user_id).first()
-    if user:
-        message = 'User %r deleted' % user
-        db.session.delete(user)
-        db.session.commit()
-        flash(message)
-    else:
-        flash('User %i does not exists' % user_id)
+    user = User.query.get_or_404(user_id)
+    message = 'User %r deleted' % user
+    db.session.delete(user)
+    db.session.commit()
+    flash(message)
     return redirect(url_for('list_users'))
 
 @app.route('/stories/<int:user_id>')
 def display_stories(user_id):
-    stories = Story.query.filter_by(user_id = user_id).all()
-    user = User.query.filter_by(id = user_id).first()
-    return render_template('stories/list.html', stories = stories, user = user)
+    user = User.query.get_or_404(user_id)
+    return render_template('stories/list.html', stories = user.stories, user = user)
 
 @app.route('/stories/<int:user_id>/new', methods=['GET', 'POST'])
 @app.route('/stories/new', methods=['GET', 'POST'])
