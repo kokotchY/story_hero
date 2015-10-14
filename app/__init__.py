@@ -6,6 +6,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from flask.ext.session import Session
 from flask.ext.login import LoginManager
 import os
+import sys
 
 db = SQLAlchemy()
 toolbar = DebugToolbarExtension()
@@ -28,6 +29,8 @@ def create_app():
     app.config['SQLALCHEMY_ECHO'] = False
     app.config['SESSION_TYPE'] = 'filesystem'
     app.config['SESSION_USE_SIGNER'] = True
+    if sys.version_info.major == 3 and app.config['SESSION_USE_SIGNER']:
+        raise Exception('Impossible to activate the SESSION_SIGNER with python 3')
     app.config['STORY_HERO_ADMIN'] = 'kokotchy@gmail.com'
     toolbar.init_app(app)
     session.init_app(app)
