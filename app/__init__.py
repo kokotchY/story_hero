@@ -1,15 +1,13 @@
 #!/usr/bin/python
 
-from flask import Flask, render_template, session, make_response, request
+from flask import Flask, render_template, make_response, request
 from flask.ext.sqlalchemy import SQLAlchemy
-from flask_debugtoolbar import DebugToolbarExtension
 from flask.ext.session import Session
 from flask.ext.login import LoginManager
 import os
 import sys
 
 db = SQLAlchemy()
-toolbar = DebugToolbarExtension()
 session = Session()
 
 from .models import AnonymousUser, Permission
@@ -20,7 +18,7 @@ login_manager.anonymous_user = AnonymousUser
 
 the_app = None
 
-def create_app():
+def create_app(configname=None):
     global the_app
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/flask/test.db'
@@ -32,7 +30,7 @@ def create_app():
     if sys.version_info.major == 3 and app.config['SESSION_USE_SIGNER']:
         raise Exception('Impossible to activate the SESSION_SIGNER with python 3')
     app.config['STORY_HERO_ADMIN'] = 'kokotchy@gmail.com'
-    toolbar.init_app(app)
+    app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
     session.init_app(app)
     login_manager.init_app(app)
 
