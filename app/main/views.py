@@ -2,16 +2,18 @@
 # -*- UTF-8 -*-
 
 from . import main
+from .. import db
 from .forms import BulkAddStepForm, EditUserForm
 from ..decorators import admin_required, permission_required
 from ..models import User, Story, Step, InstanceStory, HistoryInstance, Role, Permission
-from flask.ext.login import login_required, current_user
+
 from flask import render_template, request, redirect, url_for, flash, session, Response, abort, Markup, current_app
+from flask.ext.login import login_required, current_user
+from flask.ext.sqlalchemy import get_debug_queries
+
 import markdown
-from .. import db
 import datetime
 from graphviz import Digraph
-from flask.ext.sqlalchemy import get_debug_queries
 
 @main.route('/stories/<int:story_id>/bulk_add_step', methods = ['GET', 'POST'])
 def add_bulk_steps(story_id):
