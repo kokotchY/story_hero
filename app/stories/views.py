@@ -58,22 +58,6 @@ def show_story(story_id):
         initial_step = None
     return render_template('stories/show.html', story = story, initial_step = initial_step)
 
-@stories.route('/<int:story_id>/new_initial_step', methods = ['GET', 'POST'])
-@login_required
-def new_initial_step(story_id):
-    story = Story.query.get_or_404(story_id)
-    if request.method == 'POST':
-        name = request.form['name']
-        content = request.form['content']
-        step = Step(name, content, story_id)
-        db.session.add(step)
-        db.session.commit()
-        story.initial_step_id = step.id
-        db.session.commit()
-        print("New step %r created" % step)
-        return redirect(url_for('stories.show_story', story_id = story_id))
-    return render_template('stories/new_step.html', story_id = story_id, initial = True, steps = [])
-
 @stories.route('/<int:story_id>/new_step', methods = ['GET', 'POST'])
 @login_required
 def new_step(story_id):
@@ -91,7 +75,7 @@ def new_step(story_id):
         db.session.add(step)
         db.session.commit()
         return redirect(url_for('stories.show_step', step_id = step.id))
-    return render_template('stories/new_step.html', story_id = story_id, initial = False, steps = steps)
+    return render_template('stories/new_step.html', story_id = story_id, steps = steps)
 
 @stories.route('/<int:story_id>/start')
 @login_required
