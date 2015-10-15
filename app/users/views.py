@@ -7,7 +7,7 @@ from ..models import User, Role
 from .. import db
 from ..decorators import admin_required
 from flask.ext.login import login_required
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash, current_app
 
 @users.route('/<int:user_id>')
 def show(user_id):
@@ -64,7 +64,7 @@ def edit(user_id):
 @admin_required
 def list():
     users = User.query.all()
-    return render_template('users.html', users = users)
+    return render_template('users.html', users = users, current_app = current_app)
 
 
 @users.route('/<int:user_id>/delete')

@@ -6,7 +6,7 @@ from . import auth
 from .forms import LoginForm, RegisterForm
 from ..models import User
 from .. import login_manager, db
-from flask.ext.login import login_required, login_user, logout_user
+from flask.ext.login import login_required, login_user, logout_user, current_user
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
@@ -39,6 +39,8 @@ def load_user(user_id):
 @auth.route('/login/<user>')
 def login_username(user):
     if current_app.debug:
+        if current_user.is_authenticated:
+            logout_user()
         user_db = User.query.filter_by(username=user).first()
         if user_db:
             login_user(user_db) 

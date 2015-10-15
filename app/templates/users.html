@@ -18,6 +18,9 @@
 						<td>
 							<a href="{{url_for('users.edit', user_id = user.id)}}">Edit user {{display_icon('edit')}}</a><br />
 							<a href="{{url_for('users.delete', user_id = user.id)}}">Delete user {{display_icon('remove')}}</a>
+							{% if current_app.debug and current_user.is_administrator() %}
+							<br /><a href="{{url_for('auth.login_username', user=user.username)}}">Login as {{user.username}} {{display_icon('log-in')}}</a>
+							{% endif %}
 						</td>
 					</tr>
 				{% endfor %}
