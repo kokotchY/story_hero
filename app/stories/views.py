@@ -6,27 +6,39 @@ from ..decorators import permission_required
 from ..models import Permission, Story, Step, User, InstanceStory, HistoryInstance
 from .forms import BulkAddStepForm
 from .. import db
-from flask import request, redirect, url_for, render_template, Response, session, Markup, flash
+from flask import request, redirect, url_for, render_template, Response, session, Markup, flash, abort
 from flask.ext.login import current_user, login_required
 from graphviz import Digraph
 import markdown
 import datetime
 
+def is_obj_of_current_user(story):
+    return story.user_id == current_user.id
+
+def flash_redirect(message, category, route):
+    flash(message, category)
+    return redirect(url_for(route))
+
 @stories.route('/<int:story_id>/bulk_add_step', methods = ['GET', 'POST'])
 @login_required
+@permission_required(Permission.CREATE_STORY)
 def add_bulk_steps(story_id):
-    form = BulkAddStepForm()
-    if form.validate_on_submit():
-        content = form.steps.data
-        for line in content.split("\n"):
-            sep_pos = line.strip().find(':')
-            step_name = line[:sep_pos]
-            step_content = line[sep_pos+1:].strip()
-            new_step = Step(step_name, step_content, story_id)
-            db.session.add(new_step)
-        db.session.commit()
-        return redirect(url_for('stories.show_story', story_id = story_id))
-    return render_template('stories/bulk_add_step.html', story_id = story_id, form = form)
+    story = Story.query.get_or_404(story_id)
+    if is_obj_of_current_user(story):
+        form = BulkAddStepForm()
+        if form.validate_on_submit():
+            content = form.steps.data
+            for line in content.split("\n"):
+                sep_pos = line.strip().find(':')
+                step_name = line[:sep_pos]
+                step_content = line[sep_pos+1:].strip()
+                new_step = Step(step_name, step_content, story_id)
+                db.session.add(new_step)
+            db.session.commit()
+            return redirect(url_for('stories.show_story', story_id = story_id))
+        return render_template('stories/bulk_add_step.html', story_id = story_id, form = form)
+    else:
+        return flash_redirect('The story does not belong to you', 'error', 'main.index')
 
 @stories.route('/<int:user_id>')
 def show(user_id):
@@ -50,32 +62,37 @@ def new(user_id = None):
 
 @stories.route('/show/<int:story_id>')
 @login_required
+@permission_required(Permission.CREATE_STORY)
 def show_story(story_id):
     story = Story.query.get_or_404(story_id)
-    if story.initial_step_id:
-        initial_step = Step.query.get(story.initial_step_id)
+    if is_obj_of_current_user(story):
+        return render_template('stories/show.html', story = story)
     else:
-        initial_step = None
-    return render_template('stories/show.html', story = story, initial_step = initial_step)
+        return flash_redirect('The story does not belong to you', 'error', 'main.index')
 
 @stories.route('/<int:story_id>/new_step', methods = ['GET', 'POST'])
 @login_required
+@permission_required(Permission.CREATE_STORY)
 def new_step(story_id):
     steps = Step.query.filter_by(story_id = story_id).all()
-    if request.method == "POST":
-        step = Step(request.form['name'], request.form['content'], story_id)
-        step.first_choice = request.form['first_choice_text']
-        step.first_choice_step_id = request.form['first_choice']
-        step.second_choice = request.form['second_choice_text']
-        step.second_choice_step_id = request.form['second_choice']
-        if "final_step" in request.form:
-            step.final = request.form['final_step'] == "on"
-        else:
-            step.final = False
-        db.session.add(step)
-        db.session.commit()
-        return redirect(url_for('stories.show_step', step_id = step.id))
-    return render_template('stories/new_step.html', story_id = story_id, steps = steps)
+    story = Story.query.get_or_404(story_id)
+    if is_obj_of_current_user(story):
+        if request.method == "POST":
+            step = Step(request.form['name'], request.form['content'], story_id)
+            step.first_choice = request.form['first_choice_text']
+            step.first_choice_step_id = request.form['first_choice']
+            step.second_choice = request.form['second_choice_text']
+            step.second_choice_step_id = request.form['second_choice']
+            if "final_step" in request.form:
+                step.final = request.form['final_step'] == "on"
+            else:
+                step.final = False
+            db.session.add(step)
+            db.session.commit()
+            return redirect(url_for('stories.show_step', step_id = step.id))
+        return render_template('stories/new_step.html', story_id = story_id, steps = steps)
+    else:
+        return flash_redirect('The story does not belong to you', 'error', 'main.index')
 
 @stories.route('/<int:story_id>/start')
 @login_required
@@ -122,7 +139,7 @@ def show_instance(instance_id, choice = None):
         content = Markup(markdown.markdown(step.content))
         return render_template('/steps/play.html', content = content, story = instance.story, step = step, instance_id = instance_id)
     else:
-        return 'This is not your story! %s != %s' % (str(type(instance.user_id)), str(type(session['user_id'])))
+        return flash_redirect('This is not your story! %s != %s' % (str(type(instance.user_id)), str(type(session['user_id']))), 'main.index')
 
 @stories.route('/')
 def list():
@@ -179,29 +196,37 @@ def generate_png(story_id):
 
 @stories.route('/<int:story_id>/set_init/<int:step_id>')
 @login_required
+@permission_required(Permission.CREATE_STORY)
 def set_initial_step(story_id, step_id):
     story = Story.query.get_or_404(story_id)
-    step = Step.query.get_or_404(step_id)
-    if step.story_id == story.id:
-        story.initial_step_id = step.id
-        db.session.commit()
-        flash('The initial step of the story %d have been changed.' % story.id, 'info')
+    if is_obj_of_current_user(story):
+        step = Step.query.get_or_404(step_id)
+        if step.story_id == story.id:
+            story.initial_step_id = step.id
+            db.session.commit()
+            flash('The initial step of the story %d have been changed.' % story.id, 'info')
+        else:
+            flash('The step %d is not a step of story %d' % (step.id, story.id), 'error')
+        return redirect(url_for('stories.show_story', story_id = story.id))
     else:
-        flash('The step %d is not a step of story %d' % (step.id, story.id), 'error')
-    return redirect(url_for('stories.show_story', story_id = story.id))
+        return flash_redirect('The story does not belong to you', 'error', 'main.index')
 
 @stories.route('/<int:story_id>/remove_init/<int:step_id>')
 @login_required
+@permission_required(Permission.CREATE_STORY)
 def remove_initial_step(story_id, step_id):
     story = Story.query.get_or_404(story_id)
-    step = Step.query.get_or_404(step_id)
-    if step.story_id == story.id and story.initial_step_id == step.id:
-        story.initial_step_id = None
-        db.session.commit()
-        flash('The initial step of the story %d have been removed.' % story.id, 'info')
+    if is_obj_of_current_user(story):
+        step = Step.query.get_or_404(step_id)
+        if step.story_id == story.id and story.initial_step_id == step.id:
+            story.initial_step_id = None
+            db.session.commit()
+            flash('The initial step of the story %d have been removed.' % story.id, 'info')
+        else:
+            flash('The step %d is not a step of story %d or the initial step of story %d' % (step.id, story.id, story.id), 'error')
+        return redirect(url_for('stories.show_story', story_id = story.id))
     else:
-        flash('The step %d is not a step of story %d or the initial step of story %d' % (step.id, story.id, story.id), 'error')
-    return redirect(url_for('stories.show_story', story_id = story.id))
+        return flash_redirect('The story does not belong to you', 'error', 'main.index')
 
 
 @stories.route('/step/<int:step_id>')
@@ -213,44 +238,45 @@ def show_step(step_id):
 
 @stories.route('/step/<int:step_id>/edit', methods = ['GET', 'POST'])
 @login_required
+@permission_required(Permission.CREATE_STORY)
 def edit_step(step_id):
     step = Step.query.get_or_404(step_id)
-    steps = Step.query.filter_by(story_id = step.story_id).all()
-    if request.method == "POST":
-        step.name = request.form['name']
-        step.content = request.form['content']
-        step.first_choice = request.form['first_choice_text']
-        step.first_choice_step_id = request.form['first_choice']
-        step.second_choice = request.form['second_choice_text']
-        step.second_choice_step_id = request.form['second_choice']
-        if "final_step" in request.form:
-            step.final = request.form['final_step'] == "on"
-        else:
-            step.final = False
-        db.session.commit()
-        return redirect(url_for('stories.show_step', step_id = step.id))
-    return render_template('steps/edit.html', story_id = step.story_id, inital = False, steps = steps, step = step)
-
-@stories.route('/steps')
-@login_required
-def list_steps():
-    steps = Step.query.all()
-    return render_template('steps/list.html', steps = steps)
+    if is_obj_of_current_user(step.story):
+        steps = Step.query.filter_by(story_id = step.story_id).all()
+        if request.method == "POST":
+            step.name = request.form['name']
+            step.content = request.form['content']
+            step.first_choice = request.form['first_choice_text']
+            step.first_choice_step_id = request.form['first_choice']
+            step.second_choice = request.form['second_choice_text']
+            step.second_choice_step_id = request.form['second_choice']
+            if "final_step" in request.form:
+                step.final = request.form['final_step'] == "on"
+            else:
+                step.final = False
+            db.session.commit()
+            return redirect(url_for('stories.show_step', step_id = step.id))
+        return render_template('steps/edit.html', story_id = step.story_id, inital = False, steps = steps, step = step)
+    else:
+        return flash_redirect('The story does not belong to you', 'error', 'main.index')
 
 @stories.route('/step/<int:step_id>/delete')
 @login_required
 @permission_required(Permission.CREATE_STORY)
 def delete_step(step_id):
     step = Step.query.get_or_404(step_id)
-    if step.story.user_id == current_user.id:
-        story_id = step.story_id
-        db.session.delete(step)
-        db.session.commit()
-        flash('The step have been deleted')
-        return redirect(url_for('stories.show_story', story_id = story_id))
+    if is_obj_of_current_user(step.story):
+        if step.story.user_id == current_user.id:
+            story_id = step.story_id
+            db.session.delete(step)
+            db.session.commit()
+            flash('The step have been deleted')
+            return redirect(url_for('stories.show_story', story_id = story_id))
+        else:
+            flash('The step is not part of one of your story')
+            return redirect(url_for('main.index'))
     else:
-        flash('The step is not part of one of your story')
-        return redirect(url_for('main.index'))
+        return flash_redirect('The story does not belong to you', 'error', 'main.index')
 
 @stories.route('/instances')
 @login_required
@@ -262,20 +288,28 @@ def instances():
 @login_required
 def delete_instance(instance_id):
     instance = InstanceStory.query.get_or_404(instance_id)
-    db.session.delete(instance)
-    db.session.commit()
-    return redirect(url_for('stories.instances'))
+    if is_obj_of_current_user(instance):
+        db.session.delete(instance)
+        db.session.commit()
+        return redirect(url_for('stories.instances'))
+    else:
+        return flash_redirect('The story does not belong to you', 'error', 'main.index')
 
 @stories.route('/instance/<int:instance_id>/history')
 @login_required
 def display_history(instance_id):
     instance = InstanceStory.query.get_or_404(instance_id)
-    return render_template('instance_history.html', instance = instance)
+    if is_obj_of_current_user(instance):
+        return render_template('instance_history.html', instance = instance)
+    else:
+        return flash_redirect('The story does not belong to you', 'error', 'main.index')
 
 @stories.route('/instance/history-<int:instance_id>.png')
 @login_required
 def display_history_png(instance_id):
     instance = InstanceStory.query.get_or_404(instance_id)
+    if not is_obj_of_current_user(instance):
+        return abort(403)
     histories = instance.history.order_by(HistoryInstance.timestamp.asc()).all()
     res = Response()
     g = Digraph(instance.story.name)
