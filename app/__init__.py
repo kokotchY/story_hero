@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- UTF-8 -*-
 
 from flask import Flask, render_template, make_response, request
 from flask.ext.sqlalchemy import SQLAlchemy

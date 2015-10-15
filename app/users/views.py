@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- UTF-8 -*-
 
 from . import users
 from .forms import EditUserForm
