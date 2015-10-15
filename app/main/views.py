@@ -3,13 +3,11 @@
 
 from . import main
 from .. import db
-from ..decorators import admin_required, permission_required
-from ..models import User, Story, Step, InstanceStory, HistoryInstance, Role, Permission
+from ..models import User
 
-from flask import render_template, request, redirect, url_for, flash, session, Response, abort,  current_app
-from flask.ext.login import login_required, current_user
+from flask import render_template, request, redirect, url_for, session, Response, abort,  current_app
+from flask.ext.login import login_required
 from flask.ext.sqlalchemy import get_debug_queries
-import datetime
 from graphviz import Digraph
 
 @main.route('/step/<int:step_id>')
