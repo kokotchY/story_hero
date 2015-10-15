@@ -64,7 +64,7 @@
 		<ul>
 		{% for instance in instances %}
 		<li>
-			<a href="{{url_for('main.show_instance', instance_id = instance.id)}}">{{instance.user.username}} @ {{instance.started}}</a>
+			<a href="{{url_for('stories.show_instance', instance_id = instance.id)}}">{{instance.user.username}} @ {{instance.started}}</a>
 		</li>
 		{% endfor %}
 		</ul>
