@@ -183,3 +183,27 @@ def generate_png(story_id):
         res.content_type = 'image/png'
         res.data = g.pipe()
     return res
+
+@stories.route('/<int:story_id>/set_init/<int:step_id>')
+def set_initial_step(story_id, step_id):
+    story = Story.query.get_or_404(story_id)
+    step = Step.query.get_or_404(step_id)
+    if step.story_id == story.id:
+        story.initial_step_id = step.id
+        db.session.commit()
+        flash('The initial step of the story %d have been changed.' % story.id, 'info')
+    else:
+        flash('The step %d is not a step of story %d' % (step.id, story.id), 'error')
+    return redirect(url_for('stories.show_story', story_id = story.id))
+
+@stories.route('/<int:story_id>/remove_init/<int:step_id>')
+def remove_initial_step(story_id, step_id):
+    story = Story.query.get_or_404(story_id)
+    step = Step.query.get_or_404(step_id)
+    if step.story_id == story.id and story.initial_step_id == step.id:
+        story.initial_step_id = None
+        db.session.commit()
+        flash('The initial step of the story %d have been removed.' % story.id, 'info')
+    else:
+        flash('The step %d is not a step of story %d or the initial step of story %d' % (step.id, story.id, story.id), 'error')
+    return redirect(url_for('stories.show_story', story_id = story.id))
