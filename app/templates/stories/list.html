@@ -7,5 +7,5 @@
 			{% endfor %}
 		</ul>
 
-		<a href="{{url_for('.new_story', user_id = user.id)}}">New story</a>
+		<a href="{{url_for('stories.new', user_id = user.id)}}">New story</a>
 {% endblock %}

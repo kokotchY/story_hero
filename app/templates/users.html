@@ -14,7 +14,7 @@
 						<td><a href="{{url_for('users.show', user_id = user.id)}}">{{user.username}}</a></td>
 						<td>{{user.email}}</td>
 						<td>{{user.role.name}}</td>
-						<td><a href="{{url_for('main.display_stories', user_id = user.id)}}">{{user.stories|length}}</a></td>
+						<td><a href="{{url_for('stories.show', user_id = user.id)}}">{{user.stories|length}}</a></td>
 						<td>
 							<a href="{{url_for('users.edit', user_id = user.id)}}">Edit user {{display_icon('edit')}}</a><br />
 							<a href="{{url_for('users.delete', user_id = user.id)}}">Delete user {{display_icon('remove')}}</a>

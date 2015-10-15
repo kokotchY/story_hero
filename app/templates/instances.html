@@ -12,7 +12,7 @@
 		{% endfor %}
 	</ul>
 	{% if not instance.finished %}
-		<a href="{{url_for('.show_instance', instance_id = instance.id)}}">{{display_icon('play')}} Continue</a>
+		<a href="{{url_for('stories.show_instance', instance_id = instance.id)}}">{{display_icon('play')}} Continue</a>
 	{% endif %}
 </li>
 {% endmacro %}

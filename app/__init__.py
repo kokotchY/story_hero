@@ -42,6 +42,9 @@ def create_app(configname=None):
     from .users import users as users_blueprint
     app.register_blueprint(users_blueprint, url_prefix='/users')
 
+    from .stories import stories as stories_blueprint
+    app.register_blueprint(stories_blueprint, url_prefix='/stories')
+
     #if app.debug:
         #app.jinja_env.exception_formatter = format_exception
 

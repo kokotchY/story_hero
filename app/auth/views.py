@@ -21,7 +21,7 @@ def login():
 
             next = request.args.get('next')
 
-            return redirect(next or url_for('index'))
+            return redirect(next or url_for('main.index'))
         else:
             flash('Unknown user or password', 'error')
     return render_template('auth/login.html', form=form)
@@ -30,7 +30,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('index'))
+    return redirect(url_for('main.index'))
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -42,7 +42,7 @@ def login_username(user):
         user_db = User.query.filter_by(username=user).first()
         if user_db:
             login_user(user_db) 
-            return redirect(url_for('index'))
+            return redirect(url_for('main.index'))
 
 @auth.route('/register', methods = ['GET', 'POST'])
 def register():

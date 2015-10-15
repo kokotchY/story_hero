@@ -46,9 +46,9 @@
 				<!-- Collect the nav links, forms, and other content for toggling -->
 				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 					<ul class="nav navbar-nav">
-						{{display_nav_link('main.stories', 'Stories', 'book')}}
+						{{display_nav_link('stories.list', 'Stories', 'book')}}
 						{% if current_user.can(Permission.CREATE_STORY) %}
-						{{display_nav_link('main.new_story', 'Create story', 'pencil')}}
+						{{display_nav_link('stories.new', 'Create story', 'pencil')}}
 						{% endif %}
 					</ul>
 					<ul class="nav navbar-nav navbar-right">
