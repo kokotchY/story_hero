@@ -13,6 +13,7 @@ import markdown
 import datetime
 
 @stories.route('/<int:story_id>/bulk_add_step', methods = ['GET', 'POST'])
+@login_required
 def add_bulk_steps(story_id):
     form = BulkAddStepForm()
     if form.validate_on_submit():
@@ -34,6 +35,7 @@ def show(user_id):
 
 @stories.route('/<int:user_id>/new', methods=['GET', 'POST'])
 @stories.route('/new', methods=['GET', 'POST'])
+@login_required
 @permission_required(Permission.CREATE_STORY)
 def new(user_id = None):
     if user_id is None:
@@ -47,6 +49,7 @@ def new(user_id = None):
     return render_template("stories/new.html", user_id = user_id)
 
 @stories.route('/show/<int:story_id>')
+@login_required
 def show_story(story_id):
     story = Story.query.get_or_404(story_id)
     if story.initial_step_id:
@@ -56,6 +59,7 @@ def show_story(story_id):
     return render_template('stories/show.html', story = story, initial_step = initial_step)
 
 @stories.route('/<int:story_id>/new_initial_step', methods = ['GET', 'POST'])
+@login_required
 def new_initial_step(story_id):
     story = Story.query.get_or_404(story_id)
     if request.method == 'POST':
@@ -71,6 +75,7 @@ def new_initial_step(story_id):
     return render_template('stories/new_step.html', story_id = story_id, initial = True, steps = [])
 
 @stories.route('/<int:story_id>/new_step', methods = ['GET', 'POST'])
+@login_required
 def new_step(story_id):
     steps = Step.query.filter_by(story_id = story_id).all()
     if request.method == "POST":
@@ -89,6 +94,7 @@ def new_step(story_id):
     return render_template('stories/new_step.html', story_id = story_id, initial = False, steps = steps)
 
 @stories.route('/<int:story_id>/start')
+@login_required
 def start_story(story_id):
     story = Story.query.get_or_404(story_id)
     instance = InstanceStory(story.id, session['user_id'], story.initial_step_id)
@@ -101,6 +107,7 @@ def start_story(story_id):
 
 @stories.route('/<int:instance_id>/play')
 @stories.route('/<int:instance_id>/play/<int:choice>')
+@login_required
 def show_instance(instance_id, choice = None):
     instance = InstanceStory.query.get_or_404(instance_id)
     if 'user_id' in session and instance.user_id == int(session['user_id']):
@@ -139,6 +146,7 @@ def list():
     return render_template('stories/all.html', stories = stories)
 
 @stories.route('/schema-<int:story_id>.dot')
+@login_required
 def generate_dot(story_id):
     story = Story.query.get_or_404(story_id)
     res = Response()
@@ -162,6 +170,7 @@ def generate_dot(story_id):
     return res
 
 @stories.route('/schema-<int:story_id>.png')
+@login_required
 def generate_png(story_id):
     story = Story.query.get_or_404(story_id)
     res = Response()
@@ -185,6 +194,7 @@ def generate_png(story_id):
     return res
 
 @stories.route('/<int:story_id>/set_init/<int:step_id>')
+@login_required
 def set_initial_step(story_id, step_id):
     story = Story.query.get_or_404(story_id)
     step = Step.query.get_or_404(step_id)
@@ -197,6 +207,7 @@ def set_initial_step(story_id, step_id):
     return redirect(url_for('stories.show_story', story_id = story.id))
 
 @stories.route('/<int:story_id>/remove_init/<int:step_id>')
+@login_required
 def remove_initial_step(story_id, step_id):
     story = Story.query.get_or_404(story_id)
     step = Step.query.get_or_404(step_id)
@@ -210,12 +221,14 @@ def remove_initial_step(story_id, step_id):
 
 
 @stories.route('/step/<int:step_id>')
+@login_required
 def show_step(step_id):
     step = Step.query.get_or_404(step_id)
     story = Story.query.get_or_404(step.story_id)
     return render_template('steps/show.html', step = step, story = story)
 
 @stories.route('/step/<int:step_id>/edit', methods = ['GET', 'POST'])
+@login_required
 def edit_step(step_id):
     step = Step.query.get_or_404(step_id)
     steps = Step.query.filter_by(story_id = step.story_id).all()
@@ -235,11 +248,13 @@ def edit_step(step_id):
     return render_template('steps/edit.html', story_id = step.story_id, inital = False, steps = steps, step = step)
 
 @stories.route('/steps')
+@login_required
 def list_steps():
     steps = Step.query.all()
     return render_template('steps/list.html', steps = steps)
 
 @stories.route('/step/<int:step_id>/delete')
+@login_required
 def delete_step(step_id):
     pass
 
@@ -250,6 +265,7 @@ def instances():
     return render_template('instances.html', instances = instances, HistoryInstance = HistoryInstance)
 
 @stories.route('/instances/<int:instance_id>/delete')
+@login_required
 def delete_instance(instance_id):
     instance = InstanceStory.query.get_or_404(instance_id)
     db.session.delete(instance)
@@ -257,11 +273,13 @@ def delete_instance(instance_id):
     return redirect(url_for('stories.instances'))
 
 @stories.route('/instance/<int:instance_id>/history')
+@login_required
 def display_history(instance_id):
     instance = InstanceStory.query.get_or_404(instance_id)
     return render_template('instance_history.html', instance = instance)
 
 @stories.route('/instance/history-<int:instance_id>.png')
+@login_required
 def display_history_png(instance_id):
     instance = InstanceStory.query.get_or_404(instance_id)
     histories = instance.history.order_by(HistoryInstance.timestamp.asc()).all()
@@ -306,6 +324,7 @@ def display_history_png(instance_id):
 
 @stories.route('/my_stories')
 @login_required
+@permission_required(Permission.CREATE_STORY)
 def user_stories():
     stories = current_user.stories
     return render_template('stories/user.html', stories = stories, user = current_user)
