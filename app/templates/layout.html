@@ -40,29 +40,29 @@
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
 					</button>
-					<a class="navbar-brand" href="{{url_for('.index')}}">Story Hero</a>
+					<a class="navbar-brand" href="{{url_for('main.index')}}">Story Hero</a>
 				</div>
 
 				<!-- Collect the nav links, forms, and other content for toggling -->
 				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 					<ul class="nav navbar-nav">
-						{{display_nav_link('.stories', 'Stories', 'book')}}
+						{{display_nav_link('main.stories', 'Stories', 'book')}}
 						{% if current_user.can(Permission.CREATE_STORY) %}
-						{{display_nav_link('.new_story', 'Create story', 'pencil')}}
+						{{display_nav_link('main.new_story', 'Create story', 'pencil')}}
 						{% endif %}
 					</ul>
 					<ul class="nav navbar-nav navbar-right">
 						{% if current_user.is_authenticated %}
 						{% if current_user.is_administrator() %}
-						{{display_nav_link('.list_users', 'Users', 'list')}}
+						{{display_nav_link('users.list', 'Users', 'list')}}
 						{% endif %}
 						<li class="dropdown">
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
 								{% if current_user.is_administrator() %}{{display_icon('flash')}}{% endif %}
 								{{display_icon('user')}} {{session['username']}}<span class="caret"></span></a>
 							<ul class="dropdown-menu">
-								{{display_nav_link('.show_user', 'My profile', user_id = session['user_id'])}}
-								{{display_nav_link('.instances', 'Instances')}}
+								{{display_nav_link('users.show', 'My profile', user_id = session['user_id'])}}
+								{{display_nav_link('main.instances', 'Instances')}}
 								<li role="separator" class="divider"></li>
 								{{display_nav_link('auth.logout', 'Logout', 'log-out')}}
 							</ul>
