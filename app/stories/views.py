@@ -7,7 +7,7 @@ from ..models import Permission, Story, Step, User, InstanceStory, HistoryInstan
 from .forms import BulkAddStepForm
 from .. import db
 from flask import request, redirect, url_for, render_template, Response, session, Markup
-from flask.ext.login import current_user
+from flask.ext.login import current_user, login_required
 from graphviz import Digraph
 import markdown
 import datetime
@@ -85,7 +85,7 @@ def new_step(story_id):
             step.final = False
         db.session.add(step)
         db.session.commit()
-        return redirect(url_for('main.show_step', step_id = step.id))
+        return redirect(url_for('stories.show_step', step_id = step.id))
     return render_template('stories/new_step.html', story_id = story_id, initial = False, steps = steps)
 
 @stories.route('/<int:story_id>/start')
@@ -207,3 +207,99 @@ def remove_initial_step(story_id, step_id):
     else:
         flash('The step %d is not a step of story %d or the initial step of story %d' % (step.id, story.id, story.id), 'error')
     return redirect(url_for('stories.show_story', story_id = story.id))
+
+
+@stories.route('/step/<int:step_id>')
+def show_step(step_id):
+    step = Step.query.get_or_404(step_id)
+    story = Story.query.get_or_404(step.story_id)
+    return render_template('steps/show.html', step = step, story = story)
+
+@stories.route('/step/<int:step_id>/edit', methods = ['GET', 'POST'])
+def edit_step(step_id):
+    step = Step.query.get_or_404(step_id)
+    steps = Step.query.filter_by(story_id = step.story_id).all()
+    if request.method == "POST":
+        step.name = request.form['name']
+        step.content = request.form['content']
+        step.first_choice = request.form['first_choice_text']
+        step.first_choice_step_id = request.form['first_choice']
+        step.second_choice = request.form['second_choice_text']
+        step.second_choice_step_id = request.form['second_choice']
+        if "final_step" in request.form:
+            step.final = request.form['final_step'] == "on"
+        else:
+            step.final = False
+        db.session.commit()
+        return redirect(url_for('stories.show_step', step_id = step.id))
+    return render_template('steps/edit.html', story_id = step.story_id, inital = False, steps = steps, step = step)
+
+@stories.route('/steps')
+def list_steps():
+    steps = Step.query.all()
+    return render_template('steps/list.html', steps = steps)
+
+@stories.route('/step/<int:step_id>/delete')
+def delete_step(step_id):
+    pass
+
+@stories.route('/instances')
+@login_required
+def instances():
+    instances = InstanceStory.query.filter_by(user_id = session['user_id']).all()
+    return render_template('instances.html', instances = instances, HistoryInstance = HistoryInstance)
+
+@stories.route('/instances/<int:instance_id>/delete')
+def delete_instance(instance_id):
+    instance = InstanceStory.query.get_or_404(instance_id)
+    db.session.delete(instance)
+    db.session.commit()
+    return redirect(url_for('stories.instances'))
+
+@stories.route('/instance/<int:instance_id>/history')
+def display_history(instance_id):
+    instance = InstanceStory.query.get_or_404(instance_id)
+    return render_template('instance_history.html', instance = instance)
+
+@stories.route('/instance/history-<int:instance_id>.png')
+def display_history_png(instance_id):
+    instance = InstanceStory.query.get_or_404(instance_id)
+    histories = instance.history.order_by(HistoryInstance.timestamp.asc()).all()
+    res = Response()
+    g = Digraph(instance.story.name)
+    step_ids = []
+    for history in histories:
+        if history.from_step_id and not history.from_step_id in step_ids:
+            step_ids.append(history.from_step_id)
+        if history.to_step_id and not history.to_step_id in step_ids:
+            step_ids.append(history.to_step_id)
+
+    steps_tmp = Step.query.filter(Step.id.in_(step_ids))
+    steps = {}
+    for step in steps_tmp:
+        steps[step.id] = step
+
+    for history in histories:
+        if history.from_step_id and not history.from_step_id in steps:
+            step = Step.query.get(history.from_step_id)
+            steps[history.from_step_id] = step
+        if history.to_step_id and not history.to_step_id in steps:
+            step = Step.query.get(history.to_step_id)
+            steps[history.to_step_id] = step
+    for step_id in steps:
+        step = steps[step_id]
+        if step.final:
+            g.node('step_%d' % step.id, label=step.name, color="lightblue2", style="filled")
+        else:
+            g.node('step_%d' % step.id, label=step.name)
+
+    index = 1
+    for history in histories:
+        if history.from_step_id:
+            g.edge('step_%d' % history.from_step_id, 'step_%d' % history.to_step_id, label = "%d. %s" % (index, history.choice_text))
+            index += 1
+
+    g.format = 'png'
+    res.content_type = "image/png"
+    res.data = g.pipe()
+    return res

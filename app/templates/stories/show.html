@@ -27,15 +27,15 @@
 			{% set line_style = None %}
 			{% endif %}
 			<tr {% if line_style %}class="{{line_style}}"{%endif%}>
-				<td><a href="{{url_for('main.show_step', step_id = step.id)}}">{{step.name}}</a></td>
+				<td><a href="{{url_for('stories.show_step', step_id = step.id)}}">{{step.name}}</a></td>
 				<td>{{step.first_choice}}</td>
 				<td>{{step.first_choice_step_id}}</td>
 				<td>{{step.second_choice}}</td>
 				<td>{{step.second_choice_step_id}}</td>
 				<td>{{step.final}}</td>
 				<td>
-					<a href="{{url_for('main.edit_step', step_id = step.id)}}">Edit {{display_icon('edit')}}</a><br />
-					<a href="{{url_for('main.delete_step', step_id = step.id)}}">Delete {{display_icon('remove')}}</a><br />
+					<a href="{{url_for('stories.edit_step', step_id = step.id)}}">Edit {{display_icon('edit')}}</a><br />
+					<a href="{{url_for('stories.delete_step', step_id = step.id)}}">Delete {{display_icon('remove')}}</a><br />
 					{% if step.id == story.initial_step_id %}
 					<a href="{{url_for('stories.remove_initial_step', step_id = step.id, story_id = story.id)}}">Remove initial step {{display_icon('remove')}}</a>
 					{% else %}

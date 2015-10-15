@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
-		<form action="{{url_for('main.edit_step', step_id = step.id)}}" method="post">
+		<form action="{{url_for('stories.edit_step', step_id = step.id)}}" method="post">
 			<div>
 				<label for="name">Name:</label>
 				<input id="name" type="text" name="name" value="{{step.name}}"/>

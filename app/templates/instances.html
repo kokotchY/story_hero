@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% macro display_instance(instance) %}
 <li class="list-group-item"><strong>{{instance.story.name}}</strong> started by {{instance.user.username}} @ {{instance.started}} 
-	{% if instance.finished %}and finished {{instance.finished_timestamp}} {% endif %}(<a href="{{url_for('main.delete_instance', instance_id = instance.id)}}">Delete</a>), <a href="{{url_for('main.display_history', instance_id = instance.id)}}">{{display_icon('film')}} Display history</a>:
+	{% if instance.finished %}and finished {{instance.finished_timestamp}} {% endif %}(<a href="{{url_for('stories.delete_instance', instance_id = instance.id)}}">Delete</a>), <a href="{{url_for('stories.display_history', instance_id = instance.id)}}">{{display_icon('film')}} Display history</a>:
 	<ul>
 		{% for history in instance.history.order_by(HistoryInstance.timestamp.asc()) %}
 		{% if history.from_step_id %}
