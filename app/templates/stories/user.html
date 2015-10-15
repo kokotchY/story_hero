@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
-		<h2>Stories of user {{user.username}}</h2>
+		<h2>My stories</h2>
 		{% include 'stories/_stories.html' %}
 		<a href="{{url_for('stories.new', user_id = user.id)}}">New story</a>
 {% endblock %}

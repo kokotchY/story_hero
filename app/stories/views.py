@@ -303,3 +303,9 @@ def display_history_png(instance_id):
     res.content_type = "image/png"
     res.data = g.pipe()
     return res
+
+@stories.route('/my_stories')
+@login_required
+def user_stories():
+    stories = current_user.stories
+    return render_template('stories/user.html', stories = stories, user = current_user)
