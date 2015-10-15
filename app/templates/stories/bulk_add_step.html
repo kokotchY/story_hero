@@ -3,7 +3,7 @@
 <div class="page-header">
 		<h1>Bulk add steps for {{story_id}}</h1>
 </div>
-<FORM ACTion="{{url_for('.add_bulk_steps', story_id = story_id)}}" method="post">
+<form action="{{url_for('stories.add_bulk_steps', story_id = story_id)}}" method="post">
 	{{form.csrf_token()}}	 
 	<div class="form-group">
 		{{form.steps.label}}<br />

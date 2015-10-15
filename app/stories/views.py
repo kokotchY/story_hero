@@ -24,7 +24,7 @@ def add_bulk_steps(story_id):
             new_step = Step(step_name, step_content, story_id)
             db.session.add(new_step)
         db.session.commit()
-        return redirect(url_for('.show_story', story_id = story_id))
+        return redirect(url_for('stories.show_story', story_id = story_id))
     return render_template('stories/bulk_add_step.html', story_id = story_id, form = form)
 
 @stories.route('/<int:user_id>')
@@ -43,7 +43,7 @@ def new(user_id = None):
         story = Story(name, user_id)
         db.session.add(story)
         db.session.commit()
-        return redirect(url_for('.show_story', story_id = story.id))
+        return redirect(url_for('stories.show_story', story_id = story.id))
     return render_template("stories/new.html", user_id = user_id)
 
 @stories.route('/show/<int:story_id>')
@@ -67,7 +67,7 @@ def new_initial_step(story_id):
         story.initial_step_id = step.id
         db.session.commit()
         print("New step %r created" % step)
-        return redirect(url_for('.show_story', story_id = story_id))
+        return redirect(url_for('stories.show_story', story_id = story_id))
     return render_template('stories/new_step.html', story_id = story_id, initial = True, steps = [])
 
 @stories.route('/<int:story_id>/new_step', methods = ['GET', 'POST'])
@@ -97,7 +97,7 @@ def start_story(story_id):
     history = HistoryInstance(instance.id, None, story.initial_step_id, None)
     db.session.add(history)
     db.session.commit()
-    return redirect(url_for('.show_instance', instance_id = instance.id))
+    return redirect(url_for('stories.show_instance', instance_id = instance.id))
 
 @stories.route('/<int:instance_id>/play')
 @stories.route('/<int:instance_id>/play/<int:choice>')

@@ -1,9 +1,9 @@
 {% extends "layout.html" %}
 {% block content %}
 		{% if initial %}
-		<form action="{{url_for('.new_initial_step', story_id = story_id)}}" method="post">
+		<form action="{{url_for('stories.new_initial_step', story_id = story_id)}}" method="post">
 		{% else %}
-		<form action="{{url_for('.new_step', story_id = story_id)}}" method="post">
+		<form action="{{url_for('stories.new_step', story_id = story_id)}}" method="post">
 		{% endif %}
 			<div>
 				<label for="name">Name:</label>

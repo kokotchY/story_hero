@@ -22,7 +22,7 @@ def add():
         user = User(username, email)
         db.session.add(user)
         db.session.commit()
-        return redirect(url_for('.show', user_id = user.id))
+        return redirect(url_for('users.show', user_id = user.id))
     return render_template('users/add.html')
 
 @users.route('/<int:user_id>/edit', methods = ['GET', 'POST'])

@@ -34,7 +34,7 @@ def edit_step(step_id):
         else:
             step.final = False
         db.session.commit()
-        return redirect(url_for('.show_step', step_id = step.id))
+        return redirect(url_for('main.show_step', step_id = step.id))
     return render_template('steps/edit.html', story_id = step.story_id, inital = False, steps = steps, step = step)
 
 @main.route('/steps')
@@ -61,7 +61,7 @@ def delete_instance(instance_id):
     instance = InstanceStory.query.get_or_404(instance_id)
     db.session.delete(instance)
     db.session.commit()
-    return redirect(url_for('.instances'))
+    return redirect(url_for('main.instances'))
 
 @main.route('/settings')
 @login_required

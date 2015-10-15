@@ -9,7 +9,7 @@
 			First choice:
 			{% if step.first_choice %}
 				{% if step.first_choice_step_id %}
-			<a href="{{url_for('.show_step', step_id = step.first_choice_step_id)}}">{{step.first_choice}}</a>
+			<a href="{{url_for('main.show_step', step_id = step.first_choice_step_id)}}">{{step.first_choice}}</a>
 				{% else %}
 				{{step.first_choice}}
 				{% endif %}
@@ -21,7 +21,7 @@
 			Second choice:
 			{% if step.second_choice %}
 				{% if step.second_choice_step_id %}
-			<a href="{{url_for('.show_step', step_id = step.second_choice_step_id)}}">{{step.second_choice}}</a>
+			<a href="{{url_for('main.show_step', step_id = step.second_choice_step_id)}}">{{step.second_choice}}</a>
 				{% else %}
 				{{step.second_choice}}
 				{% endif %}

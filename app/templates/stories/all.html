@@ -5,8 +5,8 @@
 	<div class="panel-body">
 		<ul class="list-group">
 			{% for story in stories %}
-			<li class="list-group-item">{{story.name}} (current play: {{story.instances.filter_by(finished=False).all()|length}}){% if current_user.is_authenticated %}: <a href="{{url_for('.start_story', story_id = story.id)}}">Start</a>{% endif %}<br />
-				<img src="{{url_for('.generate_png', story_id = story.id)}}" alt="story-{{story.id}}" />
+			<li class="list-group-item">{{story.name}} (current play: {{story.instances.filter_by(finished=False).all()|length}}){% if current_user.is_authenticated %}: <a href="{{url_for('stories.start_story', story_id = story.id)}}">Start</a>{% endif %}<br />
+				<img src="{{url_for('stories.generate_png', story_id = story.id)}}" alt="story-{{story.id}}" />
 			</li>
 			{% endfor %}
 		</ul>
