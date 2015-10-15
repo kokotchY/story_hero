@@ -6,7 +6,7 @@ from ..decorators import permission_required
 from ..models import Permission, Story, Step, User, InstanceStory, HistoryInstance
 from .forms import BulkAddStepForm
 from .. import db
-from flask import request, redirect, url_for, render_template, Response, session, Markup
+from flask import request, redirect, url_for, render_template, Response, session, Markup, flash
 from flask.ext.login import current_user, login_required
 from graphviz import Digraph
 import markdown
@@ -239,8 +239,18 @@ def list_steps():
 
 @stories.route('/step/<int:step_id>/delete')
 @login_required
+@permission_required(Permission.CREATE_STORY)
 def delete_step(step_id):
-    pass
+    step = Step.query.get_or_404(step_id)
+    if step.story.user_id == current_user.id:
+        story_id = step.story_id
+        db.session.delete(step)
+        db.session.commit()
+        flash('The step have been deleted')
+        return redirect(url_for('stories.show_story', story_id = story_id))
+    else:
+        flash('The step is not part of one of your story')
+        return redirect(url_for('main.index'))
 
 @stories.route('/instances')
 @login_required
